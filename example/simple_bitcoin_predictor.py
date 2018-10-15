@@ -43,7 +43,7 @@ class SimpleBitcoinPredictor:
         self.loss = tf.losses.softmax_cross_entropy(self.y, logits)
 
 
-data = pandas.read_csv("resources/bitstampUSD_1-min_data_2012-01-01_to_2018-06-27.csv")
+data = pandas.read_csv("../resources/bitstampUSD_1-min_data_2012-01-01_to_2018-06-27.csv")
 
 xy = data.get_values().tolist()
 
@@ -66,12 +66,12 @@ with tf.Session() as session:
     state = zero_state
 
     for i in range(10):
-        x = np.array(xy[i])
-        y = np.array(xy[i + 1])
+        x = np.array([[xy[i]]])
+        y = np.array([xy[i + 1]])
 
         print(x, y)
         session.run(minimize_operation,
-                    {model.batch_size: 1, model.x: [[x.transpose()]], model.y: [y], model.in_state: state})
+                    {model.batch_size: 1, model.x: x, model.y: y, model.in_state: state})
 
         if i % 10 == 9:
             print("i:", i)
