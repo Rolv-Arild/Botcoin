@@ -1,3 +1,5 @@
+import pandas
+
 import numpy as np
 import tensorflow as tf
 from tensorflow.contrib.data import CsvDataset
@@ -41,20 +43,14 @@ class SimpleBitcoinPredictor:
         self.loss = tf.losses.softmax_cross_entropy(self.y, logits)
 
 
-filenames = ["resources/bitstampUSD_1-min_data_2012-01-01_to_2018-06-27.csv"]
-record_defaults = [tf.float32] * 8   # Eight required float columns
-dataset = CsvDataset(filenames, record_defaults)
+data = pandas.read_csv("resources/bitstampUSD_1-min_data_2012-01-01_to_2018-06-27.csv")
 
-x = dataset.batch(2630880)  # 5 years (2012.01.01 - 2017.01.01)
-y = dataset.skip(2630880)
+xy = data.get_values().tolist()
 
-print(x, y)
+encodings_size = 8
+alphabet_size = 8
 
-print(dataset)
-x_train = x
-y_train = y
-
-model = SimpleBitcoinPredictor(8, 8)
+model = SimpleBitcoinPredictor(encodings_size, alphabet_size)
 
 # Training: adjust the model so that its loss is minimized
 minimize_operation = tf.train.RMSPropOptimizer(0.05).minimize(model.loss)
@@ -65,17 +61,21 @@ with tf.Session() as session:
     session.run(tf.global_variables_initializer())
 
     # Initialize model.in_state
-    zero_state = session.run(model.in_state, {model.batch_size: 7})
+    zero_state = session.run(model.in_state, {model.batch_size: alphabet_size})
 
-    for epoch in range(500):
+    state = zero_state
+
+    for i in range(10):
+        x = np.array(xy[i])
+        y = np.array(xy[i + 1])
+
+        print(x, y)
         session.run(minimize_operation,
-                    {model.batch_size: 1, model.x: x_train, model.y: y_train, model.in_state: zero_state})
+                    {model.batch_size: 1, model.x: [[x.transpose()]], model.y: [y], model.in_state: state})
 
-        if epoch % 10 == 9:
-            print("epoch", epoch)
-            print("loss", session.run(model.loss, {model.batch_size: 1, model.x: x_train, model.y: y_train,
-                                                   model.in_state: zero_state}))
+        if i % 10 == 9:
+            print("i:", i)
+            print("loss", session.run(model.loss, {model.batch_size: 1, model.x: x, model.y: y,
+                                                   model.in_state: state}))
 
             state = session.run(model.in_state, {model.batch_size: 1})
-            text = 'hat'
-            print(text)
