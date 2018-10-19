@@ -82,11 +82,11 @@ with tf.Session() as session:
                          model.y: sample_y,
                          model.in_state: zero_state})
 
-            print("loss", session.run(model.loss,
-                                      {model.batch_size: batch_size,
-                                       model.x: sample,
-                                       model.y: sample_y,
-                                       model.in_state: zero_state}))
+            print("i:", i, ", loss", session.run(model.loss,
+                                                 {model.batch_size: batch_size,
+                                                  model.x: sample,
+                                                  model.y: sample_y,
+                                                  model.in_state: zero_state}))
 
         print("epoch", epoch)
 
