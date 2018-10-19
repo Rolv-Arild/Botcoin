@@ -35,10 +35,10 @@ class SimpleBitcoinPredictor:
         logits = tf.nn.bias_add(tf.matmul(lstm[:, -1, :], W), b)
 
         # Predictor
-        self.f = tf.nn.softmax(logits)
+        self.f = logits
 
         # Cross Entropy loss
-        self.loss = tf.losses.softmax_cross_entropy(self.y, logits)
+        self.loss = tf.losses.mean_squared_error(self.y, logits)
 
 
 data = pandas.read_csv("../resources/bitstampUSD_1-min_data_2012-01-01_to_2018-06-27.csv")
@@ -51,7 +51,7 @@ alphabet_size = 8
 model = SimpleBitcoinPredictor(encodings_size, alphabet_size)
 
 # Training: adjust the model so that its loss is minimized
-minimize_operation = tf.train.RMSPropOptimizer(0.05).minimize(model.loss)
+minimize_operation = tf.train.RMSPropOptimizer(500).minimize(model.loss)
 
 sample_size = 10000
 batch_size = 1
