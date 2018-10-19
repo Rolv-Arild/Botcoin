@@ -45,6 +45,7 @@ class SimpleBitcoinPredictor:
 data = pandas.read_csv("../resources/bitstampUSD_1-min_data_2012-01-01_to_2018-06-27.csv")
 
 xy = data.get_values().tolist()
+xy = [r.pop(0) for r in xy]
 
 encodings_size = 8
 alphabet_size = 8
@@ -55,7 +56,7 @@ model = SimpleBitcoinPredictor(encodings_size, alphabet_size)
 minimize_operation = tf.train.RMSPropOptimizer(500).minimize(model.loss)
 
 sample_size = 10000
-batch_size = 1000
+batch_size = 100
 
 # Create session for running TensorFlow operations
 with tf.Session() as session:
