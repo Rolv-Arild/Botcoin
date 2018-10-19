@@ -43,6 +43,9 @@ class SimpleBitcoinPredictor:
         # Cross Entropy loss
         self.loss = tf.losses.mean_squared_error(self.y, logits)
 
+        # Accuracy
+        self.accuracy = tf.norm(tf.reduce_mean(self.f-self.y))
+
 
 data = pandas.read_csv("../resources/bitstampUSD_1-min_data_2012-01-01_to_2018-06-27.csv")
 
@@ -83,7 +86,7 @@ with tf.Session() as session:
     for epoch in range(1):
         for i in range(0, (len(x_train) - sample_size) // batch_size, batch_size):
             sample = [x_train[i + j:i + j + sample_size + 1] for j in range(batch_size)]
-            sample_y = [y[i + j] for j in range(batch_size)]
+            sample_y = [y_train[i + j] for j in range(batch_size)]
             session.run(minimize_operation,
                         {model.batch_size: batch_size,
                          model.x: sample,
@@ -97,9 +100,14 @@ with tf.Session() as session:
                                                   model.in_state: zero_state}))
 
         # Test model on test data
-        print("epoch", epoch, ", loss", session.run(model.loss,
-                                                    {model.batch_size: batch_size,
-                                                     model.x: x_test,
-                                                     model.y: y_test,
-                                                     model.in_state: zero_state}))
+        for i in range(0, (len(x_test) - sample_size) // batch_size, batch_size):
+            sample = [x_test[i + j:i + j + sample_size + 1] for j in range(batch_size)]
+            sample_y = [y_test[i + j] for j in range(batch_size)]
+
+            print("accuracy", session.run(model.accuracy,
+                                          {model.batch_size: batch_size,
+                                           model.x: sample,
+                                           model.y: sample_y,
+                                           model.in_state: zero_state}))
+
     session.close()
