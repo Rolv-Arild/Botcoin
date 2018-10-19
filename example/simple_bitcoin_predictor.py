@@ -53,8 +53,8 @@ for r in x:
 x, maxes = normalize_data(x)
 y = find_increase(x, -1)
 
-encodings_size = len(x)
-alphabet_size = len(y)
+encodings_size = len(x[1])
+alphabet_size = len(y[1])
 
 model = SimpleBitcoinPredictor(encodings_size, alphabet_size)
 
@@ -73,18 +73,19 @@ with tf.Session() as session:
     zero_state = session.run(model.in_state, {model.batch_size: batch_size})
 
     for epoch in range(500):
-        for i in range((len(x) - sample_size) // batch_size):
+        for i in range(0, (len(x) - sample_size) // batch_size, batch_size):
             sample = [x[i + j:i + j + sample_size + 1] for j in range(batch_size)]
+            sample_y = [y[i + j] for j in range(sample_size)]
             session.run(minimize_operation,
                         {model.batch_size: batch_size,
                          model.x: sample,
-                         model.y: [y[i] for i in range(len(sample))],
+                         model.y: sample_y,
                          model.in_state: zero_state})
 
             print("loss", session.run(model.loss,
                                       {model.batch_size: batch_size,
                                        model.x: sample,
-                                       model.y: [y[i] for i in range(len(sample))],
+                                       model.y: sample_y,
                                        model.in_state: zero_state}))
 
         print("epoch", epoch)

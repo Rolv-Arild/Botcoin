@@ -12,32 +12,26 @@ def normalize_data(data, from_zero=True):
                 if d[i] < min_vals[i]:
                     min_vals[i] = d[i]
 
-        normalized = list(data)
-        for d in normalized:
+        for d in data:
             for i in range(len(d)):
                 d[i] = (d[i] - min_vals[i]) / (max_vals[i] - min_vals[i])
 
-        return normalized, max_vals, min_vals
+        return data, max_vals, min_vals
     else:
         for d in data[1:]:
             for i in range(len(d)):
                 if d[i] > max_vals[i]:
                     max_vals[i] = d[i]
 
-        normalized = list(data)
-        for d in normalized:
+        for d in data:
             for i in range(len(d)):
                 d[i] = d[i] / max_vals[i]
 
-        return normalized, max_vals
+        return data, max_vals
 
 
 def find_increase(data, index):
-    y = [0] * len(data)
-    for i in range(1, len(data)):
-        y[i] = data[i][index] / data[i - 1][index] - 1
-
-    return y
+    return [[data[i][index] / data[i - 1][index] - 1] for i in range(1, len(data))]
 
 
 def convert_timestamp(timestamp):
