@@ -54,6 +54,7 @@ model = SimpleBitcoinPredictor(encodings_size, alphabet_size)
 minimize_operation = tf.train.RMSPropOptimizer(0.05).minimize(model.loss)
 
 sample_size = 10000
+batch_size = 1
 
 
 # Create session for running TensorFlow operations
@@ -62,17 +63,17 @@ with tf.Session() as session:
     session.run(tf.global_variables_initializer())
 
     # Initialize model.in_state
-    zero_state = session.run(model.in_state, {model.batch_size: alphabet_size})
+    zero_state = session.run(model.in_state, {model.batch_size: batch_size})
 
     for epoch in range(500):
         for i in range(len(xy) - sample_size):
             sample = xy[i:i + sample_size + 1]
             session.run(minimize_operation,
-                        {model.batch_size: np.shape(sample)[0], model.x: [sample[:-1]], model.y: [sample[-1]],
+                        {model.batch_size: batch_size, model.x: [sample[:-1]], model.y: [sample[-1]],
                          model.in_state: zero_state})
 
             print("loss", session.run(model.loss,
-                                      {model.batch_size: np.shape(sample)[0], model.x: [sample[:-1]], model.y: [sample[-1]],
+                                      {model.batch_size: batch_size, model.x: [sample[:-1]], model.y: [sample[-1]],
                                        model.in_state: zero_state}))
 
         print("epoch", epoch)
