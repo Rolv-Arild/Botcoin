@@ -75,7 +75,7 @@ with tf.Session() as session:
     for epoch in range(500):
         for i in range(0, (len(x) - sample_size) // batch_size, batch_size):
             sample = [x[i + j:i + j + sample_size + 1] for j in range(batch_size)]
-            sample_y = [y[i + j] for j in range(sample_size)]
+            sample_y = [y[i + j] for j in range(batch_size)]
             session.run(minimize_operation,
                         {model.batch_size: batch_size,
                          model.x: sample,
