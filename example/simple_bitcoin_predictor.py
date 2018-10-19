@@ -5,6 +5,8 @@ import tensorflow as tf
 from tensorflow.contrib.data import CsvDataset
 from tensorflow.python.ops.rnn import dynamic_rnn
 
+from util.util import normalize_data, find_increase
+
 
 class SimpleBitcoinPredictor:
     def __init__(self, encoding_size, label_size):
@@ -44,17 +46,20 @@ class SimpleBitcoinPredictor:
 
 data = pandas.read_csv("../resources/bitstampUSD_1-min_data_2012-01-01_to_2018-06-27.csv")
 
-xy = data.get_values().tolist()
-for r in xy:
+x = data.get_values().tolist()
+for r in x:
     r.pop(0)
 
-encodings_size = 7
-alphabet_size = 7
+x, maxes = normalize_data(x)
+y = find_increase(x, -1)
+
+encodings_size = len(x)
+alphabet_size = len(y)
 
 model = SimpleBitcoinPredictor(encodings_size, alphabet_size)
 
 # Training: adjust the model so that its loss is minimized
-minimize_operation = tf.train.RMSPropOptimizer(50000).minimize(model.loss)
+minimize_operation = tf.train.RMSPropOptimizer(0.05).minimize(model.loss)
 
 sample_size = 10000
 batch_size = 100
@@ -68,18 +73,18 @@ with tf.Session() as session:
     zero_state = session.run(model.in_state, {model.batch_size: batch_size})
 
     for epoch in range(500):
-        for i in range((len(xy) - sample_size) // batch_size):
-            sample = [xy[i + j:i + j + sample_size + 1] for j in range(batch_size)]
+        for i in range((len(x) - sample_size) // batch_size):
+            sample = [x[i + j:i + j + sample_size + 1] for j in range(batch_size)]
             session.run(minimize_operation,
                         {model.batch_size: batch_size,
                          model.x: sample,
-                         model.y: [sample[i][-1] for i in range(len(sample))],
+                         model.y: [y[i] for i in range(len(sample))],
                          model.in_state: zero_state})
 
             print("loss", session.run(model.loss,
                                       {model.batch_size: batch_size,
                                        model.x: sample,
-                                       model.y: [sample[i][-1] for i in range(len(sample))],
+                                       model.y: [y[i] for i in range(len(sample))],
                                        model.in_state: zero_state}))
 
         print("epoch", epoch)
