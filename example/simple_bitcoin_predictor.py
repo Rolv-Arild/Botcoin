@@ -16,7 +16,8 @@ class SimpleBitcoinPredictor:
 
         # Model input
         self.batch_size = tf.placeholder(tf.int32,
-                                         [], name='batch_size')  # Needed by cell.zero_state call, and is dependent on usage (training or generation)
+                                         [],
+                                         name='batch_size')  # Needed by cell.zero_state call, and is dependent on usage (training or generation)
         self.x = tf.placeholder(tf.float32,
                                 [None, None, encoding_size], name='x')  # Shape: [batch_size, max_time, encoding_size]
         self.y = tf.placeholder(tf.float32, [None, label_size], name='y')  # Shape: [batch_size, label_size]
@@ -54,8 +55,7 @@ model = SimpleBitcoinPredictor(encodings_size, alphabet_size)
 minimize_operation = tf.train.RMSPropOptimizer(500).minimize(model.loss)
 
 sample_size = 10000
-batch_size = 1
-
+batch_size = 1000
 
 # Create session for running TensorFlow operations
 with tf.Session() as session:
@@ -66,14 +66,18 @@ with tf.Session() as session:
     zero_state = session.run(model.in_state, {model.batch_size: batch_size})
 
     for epoch in range(500):
-        for i in range(len(xy) - sample_size):
-            sample = xy[i:i + sample_size + 1]
+        for i in range((len(xy) - sample_size) // batch_size):
+            sample = [xy[i + j:i + j + sample_size + 1] for j in range(batch_size)]
             session.run(minimize_operation,
-                        {model.batch_size: batch_size, model.x: [sample[:-1]], model.y: [sample[-1]],
+                        {model.batch_size: batch_size,
+                         model.x: sample,
+                         model.y: [sample[i][-1] for i in range(len(sample))],
                          model.in_state: zero_state})
 
             print("loss", session.run(model.loss,
-                                      {model.batch_size: batch_size, model.x: [sample[:-1]], model.y: [sample[-1]],
+                                      {model.batch_size: batch_size,
+                                       model.x: sample,
+                                       model.y: [sample[i][-1] for i in range(len(sample))],
                                        model.in_state: zero_state}))
 
         print("epoch", epoch)
