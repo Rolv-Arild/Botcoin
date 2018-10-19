@@ -50,6 +50,8 @@ x = data.get_values().tolist()
 for r in x:
     r.pop(0)
 
+x = x[2625376:]  # start of 2017
+
 x, maxes = normalize_data(x)
 y = find_increase(x, -1)
 
@@ -90,4 +92,4 @@ with tf.Session() as session:
 
         print("epoch", epoch)
 
-        session.close()
+    session.close()
