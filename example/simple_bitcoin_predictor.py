@@ -51,11 +51,17 @@ for r in x:
     r.pop(0)
 
 x = x[2625376:]  # start of 2017
-
 x, maxes = normalize_data(x)
-y = find_increase(x, -1)
 
-encodings_size = len(x[1])
+cutoff = round(len(x) * 0.8)  # 80% training and 20% test data
+x_train = x[:cutoff]
+x_test = x[cutoff:]
+
+y = find_increase(x, -1)
+y_train = y[:cutoff]
+y_test = y[cutoff:]
+
+encodings_size = len(x_train[1])
 alphabet_size = len(y[1])
 
 model = SimpleBitcoinPredictor(encodings_size, alphabet_size)
@@ -74,9 +80,9 @@ with tf.Session() as session:
     # Initialize model.in_state
     zero_state = session.run(model.in_state, {model.batch_size: batch_size})
 
-    for epoch in range(500):
-        for i in range(0, (len(x) - sample_size) // batch_size, batch_size):
-            sample = [x[i + j:i + j + sample_size + 1] for j in range(batch_size)]
+    for epoch in range(1):
+        for i in range(0, (len(x_train) - sample_size) // batch_size, batch_size):
+            sample = [x_train[i + j:i + j + sample_size + 1] for j in range(batch_size)]
             sample_y = [y[i + j] for j in range(batch_size)]
             session.run(minimize_operation,
                         {model.batch_size: batch_size,
@@ -90,6 +96,10 @@ with tf.Session() as session:
                                                   model.y: sample_y,
                                                   model.in_state: zero_state}))
 
-        print("epoch", epoch)
-
+        # Test model on test data
+        print("epoch", epoch, ", loss", session.run(model.loss,
+                                                    {model.batch_size: batch_size,
+                                                     model.x: x_test,
+                                                     model.y: y_test,
+                                                     model.in_state: zero_state}))
     session.close()

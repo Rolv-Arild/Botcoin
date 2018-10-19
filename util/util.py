@@ -31,7 +31,7 @@ def normalize_data(data, from_zero=True):
 
 
 def find_increase(data, index):
-    return [[data[i][index] / data[i - 1][index] - 1] for i in range(1, len(data))]
+    return [[data[i+1][index] / data[i][index] - 1] for i in range(len(data)-1)]
 
 
 def convert_timestamp(timestamp):
