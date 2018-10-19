@@ -12,7 +12,7 @@ class SimpleBitcoinPredictor:
         cell_state_size = 128
 
         # Cells
-        cell = tf.contrib.rnn.BasicLSTMCell(cell_state_size)
+        cell = tf.contrib.rnn.LSTMCell(cell_state_size)
 
         # Model input
         self.batch_size = tf.placeholder(tf.int32,
