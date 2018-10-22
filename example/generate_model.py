@@ -6,9 +6,10 @@ from util.util import normalize_data, find_increase
 
 data = pandas.read_csv("../resources/bitstampUSD_1-min_data_2012-01-01_to_2018-06-27.csv")
 
-x = data.get_values().tolist()
-for r in x:
-    r.pop(0)
+x = data.drop("Timestamp", 1)
+# x = data.get_values().tolist()
+# for r in x:
+#     r.pop(0)
 
 x = x[2625376:]  # start of 2017
 x, maxes = normalize_data(x)
@@ -31,6 +32,8 @@ minimize_operation = tf.train.RMSPropOptimizer(0.05).minimize(model.loss)
 
 sample_size = 10000
 batch_size = 100
+
+saver = tf.train.Saver()
 
 # Create session for running TensorFlow operations
 with tf.Session() as session:
@@ -55,6 +58,5 @@ with tf.Session() as session:
                                                   model.x: sample,
                                                   model.y: sample_y,
                                                   model.in_state: zero_state}))
-    saver = tf.train.Saver()
-    save_path = saver.save(session, "/tmp/model.ckpt")
+    save_path = saver.save(session, "tmp/model.ckpt")
     session.close()
