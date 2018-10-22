@@ -2,25 +2,28 @@ import pandas
 import tensorflow as tf
 
 from example.simple_bitcoin_predictor import SimpleBitcoinPredictor
-from util.util import normalize_data, find_increase
+from util.util import find_increase
 
-data = pandas.read_csv("../resources/bitstampUSD_1-min_data_2012-01-01_to_2018-06-27.csv")
+data = pandas.read_csv("../resources/bitstampUSD_1-min_data_2012-01-01_to_2018-06-27.csv", dtype='float64')
 
 x = data.drop("Timestamp", 1)
 # x = data.get_values().tolist()
 # for r in x:
 #     r.pop(0)
 
-x = x[2625376:]  # start of 2017
-x, maxes = normalize_data(x)
+x = x.tail(len(x)-2625376)  # start of 2017
+
+# Normalize data
+maxes = x.max()
+x = x / maxes
+
+x = x.values.tolist()
 
 cutoff = round(len(x) * 0.8)  # 80% training and 20% test data
-x_train = x[:cutoff]
-x_test = x[cutoff:]
+x_train = x[cutoff:]
 
 y = find_increase(x, -1)
-y_train = y[:cutoff]
-y_test = y[cutoff:]
+y_train = y[cutoff:]
 
 encodings_size = len(x_train[1])
 alphabet_size = len(y[1])
@@ -58,5 +61,6 @@ with tf.Session() as session:
                                                   model.x: sample,
                                                   model.y: sample_y,
                                                   model.in_state: zero_state}))
+
     save_path = saver.save(session, "tmp/model.ckpt")
     session.close()

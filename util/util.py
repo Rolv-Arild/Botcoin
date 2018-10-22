@@ -2,9 +2,9 @@ import datetime
 
 
 def normalize_data(data, from_zero=True):
-    max_vals = data[0]
+    max_vals = list(data[0])
     if not from_zero:
-        min_vals = data[0]
+        min_vals = list(data[0])
         for d in data[1:]:
             for i in range(len(d)):
                 if d[i] > max_vals[i]:
