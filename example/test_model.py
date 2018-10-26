@@ -41,7 +41,7 @@ with tf.Session() as session:
     zero_state = session.run(model.in_state, {model.batch_size: batch_size})
 
     # Test model on test data
-    for i in range(0, (len(x_test) - sample_size) // batch_size, batch_size):
+    for i in range(0, batch_size * ((len(x_test) - sample_size) // batch_size), batch_size):
         sample = [x_test[i + j:i + j + sample_size + 1] for j in range(batch_size)]
         sample_y = [y_test[i + j] for j in range(batch_size)]
 
