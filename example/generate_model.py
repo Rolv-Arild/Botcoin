@@ -34,8 +34,8 @@ model = SimpleBitcoinPredictor(num_features, alphabet_size)
 # Training: adjust the model so that its loss is minimized
 minimize_operation = tf.train.RMSPropOptimizer(0.05).minimize(model.loss)
 
-sample_size = 10000
-batch_size = 100
+sample_size = 1800
+batch_size = 1000
 
 saver = tf.train.Saver()
 
@@ -63,7 +63,7 @@ with tf.Session() as session:
                                                   model.x: sample,
                                                   model.y: sample_y,
                                                   model.in_state: zero_state}))
-        print("epoch %.d, time: %.d" % (epoch, t))
+        print("epoch %.d, time: %.d" % (epoch, time.time() - t))
 
     save_path = saver.save(session, "tmp/model.ckpt")
     session.close()

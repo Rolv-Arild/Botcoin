@@ -5,7 +5,6 @@ import tensorflow as tf
 
 from util.util import find_increase
 
-saver = tf.train.Saver()
 data = pandas.read_csv("../resources/bitstampUSD_1-min_data_2012-01-01_to_2018-06-27.csv", dtype='float64')
 
 x = data.drop("Timestamp", 1)
@@ -32,8 +31,10 @@ alphabet_size = len(y[1])
 
 model = SimpleBitcoinPredictor(encodings_size, alphabet_size)
 
-sample_size = 10000
-batch_size = 200
+sample_size = 1800
+batch_size = 1000
+
+saver = tf.train.Saver()
 
 with tf.Session() as session:
     saver.restore(session, "tmp/model.ckpt")
