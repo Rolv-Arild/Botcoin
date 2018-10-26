@@ -33,7 +33,7 @@ alphabet_size = len(y[1])
 model = SimpleBitcoinPredictor(encodings_size, alphabet_size)
 
 sample_size = 10000
-batch_size = 100
+batch_size = 200
 
 with tf.Session() as session:
     saver.restore(session, "tmp/model.ckpt")
