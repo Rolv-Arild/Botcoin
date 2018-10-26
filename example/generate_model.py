@@ -1,5 +1,6 @@
 import pandas
 import tensorflow as tf
+import time
 
 from example.simple_bitcoin_predictor import SimpleBitcoinPredictor
 from util.util import find_increase
@@ -20,10 +21,10 @@ x = x / maxes
 x = x.values.tolist()
 
 cutoff = round(len(x) * 0.8)  # 80% training and 20% test data
-x_train = x[cutoff:]
+x_train = x[:cutoff]
 
 y = find_increase(x, -1)
-y_train = y[cutoff:]
+y_train = y[:cutoff]
 
 num_features = len(x_train[1])
 alphabet_size = len(y[1])
@@ -47,6 +48,7 @@ with tf.Session() as session:
     zero_state = session.run(model.in_state, {model.batch_size: batch_size})
 
     for epoch in range(1):
+        t = time.time()
         for i in range(0, batch_size * ((len(x_train) - sample_size) // batch_size), batch_size):
             sample = [x_train[i + j:i + j + sample_size + 1] for j in range(batch_size)]
             sample_y = [y_train[i + j] for j in range(batch_size)]
@@ -61,6 +63,7 @@ with tf.Session() as session:
                                                   model.x: sample,
                                                   model.y: sample_y,
                                                   model.in_state: zero_state}))
+        print("epoch %.d, time: %.d" % (epoch, t))
 
     save_path = saver.save(session, "tmp/model.ckpt")
     session.close()
