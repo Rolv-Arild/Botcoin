@@ -11,7 +11,7 @@ x = data.drop("Timestamp", 1)
 # for r in x:
 #     r.pop(0)
 
-x = x.tail(len(x)-2625376)  # start of 2017
+x = x.tail(len(x) - 2625376)  # start of 2017
 
 # Normalize data
 maxes = x.max()
@@ -47,7 +47,7 @@ with tf.Session() as session:
     zero_state = session.run(model.in_state, {model.batch_size: batch_size})
 
     for epoch in range(1):
-        for i in range(0, (len(x_train) - sample_size) // batch_size, batch_size):
+        for i in range(0, batch_size * (len(x_train) - sample_size) // batch_size, batch_size):
             sample = [x_train[i + j:i + j + sample_size + 1] for j in range(batch_size)]
             sample_y = [y_train[i + j] for j in range(batch_size)]
             session.run(minimize_operation,
