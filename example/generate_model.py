@@ -32,7 +32,7 @@ alphabet_size = len(y[1])
 model = SimpleBitcoinPredictor(num_features, alphabet_size)
 
 # Training: adjust the model so that its loss is minimized
-minimize_operation = tf.train.RMSPropOptimizer(0.05).minimize(model.loss)
+minimize_operation = tf.train.RMSPropOptimizer(0.01).minimize(model.loss)
 
 sample_size = 1800
 batch_size = 1000

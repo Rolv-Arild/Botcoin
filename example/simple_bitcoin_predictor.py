@@ -38,4 +38,4 @@ class SimpleBitcoinPredictor:
         self.loss = tf.losses.mean_squared_error(self.y, logits)
 
         # Accuracy
-        self.accuracy = tf.metrics.precision(self.y, self.f)
+        self.accuracy = tf.metrics.mean_cosine_distance(self.y, self.f, 0)
