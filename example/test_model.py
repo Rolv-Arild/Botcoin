@@ -38,7 +38,7 @@ saver = tf.train.Saver()
 
 with tf.Session() as session:
     saver.restore(session, "tmp/model.ckpt")
-    session.run(tf.global_variables_initializer())
+    session.run(tf.local_variables_initializer())
 
     zero_state = session.run(model.in_state, {model.batch_size: batch_size})
 
