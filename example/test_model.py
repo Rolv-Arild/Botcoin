@@ -3,11 +3,12 @@ import pandas
 from example.simple_bitcoin_predictor import SimpleBitcoinPredictor
 import tensorflow as tf
 
-from util.util import find_increase
+from util.util import find_increase, generate_classes
 
 data = pandas.read_csv("../resources/bitstampUSD_1-min_data_2012-01-01_to_2018-06-27.csv", dtype='float64')
 
-x = data.drop("Timestamp", 1)
+# x = data.drop("Timestamp", 1)
+x = data["Weighted_price"]
 # x = data.get_values().tolist()
 # for r in x:
 #     r.pop(0)
@@ -24,6 +25,7 @@ cutoff = round(len(x) * 0.8)  # 80% training and 20% test data
 x_test = x[:cutoff:]
 
 y = find_increase(x, -1)
+y = generate_classes(y, 5)
 y_test = y[:cutoff]
 
 encodings_size = len(x_test[1])
@@ -31,8 +33,8 @@ alphabet_size = len(y[1])
 
 model = SimpleBitcoinPredictor(encodings_size, alphabet_size)
 
-sample_size = 1800
-batch_size = 1000
+sample_size = 3600
+batch_size = 4000
 
 saver = tf.train.Saver()
 

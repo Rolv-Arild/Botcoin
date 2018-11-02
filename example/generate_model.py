@@ -7,7 +7,9 @@ from util.util import find_increase, generate_classes
 
 data = pandas.read_csv("../resources/bitstampUSD_1-min_data_2012-01-01_to_2018-06-27.csv", dtype='float64')
 
-x = data.drop("Timestamp", 1)
+# x = data.drop("Timestamp", 1)
+x = data.filter(["Weighted_Price"], axis=1)
+
 # x = data.get_values().tolist()
 # for r in x:
 #     r.pop(0)
@@ -33,9 +35,9 @@ alphabet_size = len(y[1])
 model = SimpleBitcoinPredictor(num_features, alphabet_size)
 
 # Training: adjust the model so that its loss is minimized
-minimize_operation = tf.train.RMSPropOptimizer(0.01).minimize(model.loss)
+minimize_operation = tf.train.RMSPropOptimizer(0.05).minimize(model.loss)
 
-sample_size = 1800
+sample_size = 3600
 batch_size = 1000
 
 saver = tf.train.Saver()
@@ -48,7 +50,7 @@ with tf.Session() as session:
     # Initialize model.in_state
     zero_state = session.run(model.in_state, {model.batch_size: batch_size})
 
-    for epoch in range(1):
+    for epoch in range(5):
         t = time.time()
         for i in range(0, batch_size * ((len(x_train) - sample_size) // batch_size), batch_size):
             sample = [x_train[i + j:i + j + sample_size + 1] for j in range(batch_size)]
