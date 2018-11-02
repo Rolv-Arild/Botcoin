@@ -18,27 +18,32 @@ x = x.tail(len(x) - 2625376)  # start of 2017
 
 # Normalize data
 maxes = x.max()
-x = x / maxes
+mins = x.min()
+xn = (x - mins) / (maxes - mins)
 
 x = x.values.tolist()
-
-cutoff = round(len(x) * 0.8)  # 80% training and 20% test data
-x_train = x[:cutoff]
+x = x[::60]
 
 y = find_increase(x, -1)
 y = generate_classes(y, 5)
+
+x = xn.values.tolist()
+x = x[::60]
+
+cutoff = round(len(x) * 0.8)  # 80% training and 20% test data
+x_train = x[:cutoff]
 y_train = y[:cutoff]
 
-num_features = len(x_train[1])
-alphabet_size = len(y[1])
+num_features = len(x_train[0])
+alphabet_size = len(y_train[0])
 
 model = SimpleBitcoinPredictor(num_features, alphabet_size)
 
 # Training: adjust the model so that its loss is minimized
-minimize_operation = tf.train.RMSPropOptimizer(0.05).minimize(model.loss)
+minimize_operation = tf.train.RMSPropOptimizer(0.01).minimize(model.loss)
 
-sample_size = 3600
-batch_size = 1000
+sample_size = 24*30
+batch_size = 100
 
 saver = tf.train.Saver()
 
@@ -50,7 +55,7 @@ with tf.Session() as session:
     # Initialize model.in_state
     zero_state = session.run(model.in_state, {model.batch_size: batch_size})
 
-    for epoch in range(5):
+    for epoch in range(100):
         t = time.time()
         for i in range(0, batch_size * ((len(x_train) - sample_size) // batch_size), batch_size):
             sample = [x_train[i + j:i + j + sample_size + 1] for j in range(batch_size)]

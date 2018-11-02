@@ -38,4 +38,4 @@ class SimpleBitcoinPredictor:
         self.loss = tf.losses.softmax_cross_entropy(self.y, logits)
 
         # Accuracy
-        self.accuracy = tf.reduce_mean(tf.cast(tf.equal(tf.argmax(self.f, 1), tf.argmax(self.y, 1)), dtype))
+        self.accuracy = tf.metrics.accuracy(tf.argmax(self.y, 1), tf.argmax(self.f, 1))

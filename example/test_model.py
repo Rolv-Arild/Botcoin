@@ -8,7 +8,8 @@ from util.util import find_increase, generate_classes
 data = pandas.read_csv("../resources/bitstampUSD_1-min_data_2012-01-01_to_2018-06-27.csv", dtype='float64')
 
 # x = data.drop("Timestamp", 1)
-x = data["Weighted_price"]
+x = data.filter(["Weighted_Price"], axis=1)
+
 # x = data.get_values().tolist()
 # for r in x:
 #     r.pop(0)
@@ -17,24 +18,29 @@ x = x.tail(len(x) - 2625376)  # start of 2017
 
 # Normalize data
 maxes = x.max()
-x = x / maxes
+mins = x.min()
+xn = (x - mins) / (maxes - mins)
 
 x = x.values.tolist()
-
-cutoff = round(len(x) * 0.8)  # 80% training and 20% test data
-x_test = x[:cutoff:]
+x = x[::60]
 
 y = find_increase(x, -1)
 y = generate_classes(y, 5)
-y_test = y[:cutoff]
 
-encodings_size = len(x_test[1])
-alphabet_size = len(y[1])
+x = xn.values.tolist()
+x = x[::60]
 
-model = SimpleBitcoinPredictor(encodings_size, alphabet_size)
+cutoff = round(len(x) * 0.8)  # 80% training and 20% test data
+x_test = x[cutoff:]
+y_test = y[cutoff:]
 
-sample_size = 3600
-batch_size = 4000
+num_features = len(x_test[0])
+alphabet_size = len(y_test[0])
+
+model = SimpleBitcoinPredictor(num_features, alphabet_size)
+
+batch_size = 100
+sample_size = len(y_test)-batch_size
 
 saver = tf.train.Saver()
 
