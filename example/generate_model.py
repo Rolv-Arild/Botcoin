@@ -3,7 +3,7 @@ import tensorflow as tf
 import time
 
 from example.simple_bitcoin_predictor import SimpleBitcoinPredictor
-from util.util import find_increase
+from util.util import find_increase, generate_classes
 
 data = pandas.read_csv("../resources/bitstampUSD_1-min_data_2012-01-01_to_2018-06-27.csv", dtype='float64')
 
@@ -24,6 +24,7 @@ cutoff = round(len(x) * 0.8)  # 80% training and 20% test data
 x_train = x[:cutoff]
 
 y = find_increase(x, -1)
+y = generate_classes(y, 5)
 y_train = y[:cutoff]
 
 num_features = len(x_train[1])

@@ -1,3 +1,4 @@
+import bisect
 import datetime
 
 
@@ -31,7 +32,7 @@ def normalize_data(data, from_zero=True):
 
 
 def find_increase(data, index):
-    return [[data[i+1][index] / data[i][index] - 1] for i in range(len(data)-1)]
+    return [[data[i + 1][index] / data[i][index] - 1] for i in range(len(data) - 1)]
 
 
 def convert_timestamp(timestamp):
@@ -39,3 +40,16 @@ def convert_timestamp(timestamp):
     time = date.time()
 
     return date.year, date.month, date.day, date.weekday(), (time.hour * 60 + time.minute)
+
+
+def generate_classes(y, k):
+    y_sorted = sorted(y)
+    cutoffs = [y_sorted[i * len(y_sorted) // k] for i in range(k)]
+    cutoffs.append(y_sorted[-1])
+    res = []
+    for i in range(len(y)):
+        res.append([0.0] * k)
+        val = y[i]
+        index = bisect.bisect_left(cutoffs, y[i])-1
+        res[i][index] = 1.0
+    return res
