@@ -32,10 +32,10 @@ class SimpleBitcoinPredictor:
         logits = tf.nn.bias_add(tf.matmul(lstm[:, -1, :], W), b)
 
         # Predictor
-        self.f = logits
+        self.f = tf.nn.softmax(logits)
 
         # Cross Entropy loss
-        self.loss = tf.losses.mean_squared_error(self.y, logits)
+        self.loss = tf.losses.softmax_cross_entropy(self.y, logits)
 
         # Accuracy
-        self.accuracy = tf.metrics.mean_squared_error(self.y, self.f)
+        self.accuracy = tf.reduce_mean(tf.cast(tf.equal(tf.argmax(self.f, 1), tf.argmax(self.y, 1)), dtype))
