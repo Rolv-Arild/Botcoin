@@ -39,3 +39,5 @@ class SimpleBitcoinPredictor:
 
         # Accuracy
         self.accuracy = tf.metrics.accuracy(tf.argmax(self.y, 1), tf.argmax(self.f, 1))
+
+        self.conf_matrix = tf.confusion_matrix(tf.argmax(self.y, 1), tf.argmax(self.f, 1), dtype=dtype)

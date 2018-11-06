@@ -1,35 +1,12 @@
+import numpy
 import pandas
 import tensorflow as tf
 import time
 
 from example.simple_bitcoin_predictor import SimpleBitcoinPredictor
-from util.util import find_increase, generate_classes
+from util.util import find_increase, generate_classes, get_data
 
-data = pandas.read_csv("../resources/bitstampUSD_1-min_data_2012-01-01_to_2018-06-27.csv", dtype='float64')
-
-# x = data.drop("Timestamp", 1)
-x = data.filter(["Weighted_Price"], axis=1)
-
-# x = data.get_values().tolist()
-# for r in x:
-#     r.pop(0)
-
-x = x.tail(len(x) - 2625376)  # start of 2017
-
-# Normalize data
-maxes = x.max()
-mins = x.min()
-xn = (x - mins) / (maxes - mins)
-
-x = x.values.tolist()
-x = x[::60]
-
-y = find_increase(x, -1)
-y = generate_classes(y, 5)
-
-x = xn.values.tolist()
-x = x[::60]
-
+x, y = get_data()
 cutoff = round(len(x) * 0.8)  # 80% training and 20% test data
 x_train = x[:cutoff]
 y_train = y[:cutoff]
@@ -42,7 +19,7 @@ model = SimpleBitcoinPredictor(num_features, alphabet_size)
 # Training: adjust the model so that its loss is minimized
 minimize_operation = tf.train.RMSPropOptimizer(0.01).minimize(model.loss)
 
-sample_size = 24*30
+sample_size = 24 * 30
 batch_size = 100
 
 saver = tf.train.Saver()
@@ -55,11 +32,12 @@ with tf.Session() as session:
     # Initialize model.in_state
     zero_state = session.run(model.in_state, {model.batch_size: batch_size})
 
-    for epoch in range(100):
+    for epoch in range(10):
         t = time.time()
         for i in range(0, batch_size * ((len(x_train) - sample_size) // batch_size), batch_size):
             sample = [x_train[i + j:i + j + sample_size + 1] for j in range(batch_size)]
-            sample_y = [y_train[i + j] for j in range(batch_size)]
+            sample_y = [y_train[i + j + sample_size] for j in range(batch_size)]
+            # print(sample[1][-1], sample_y[0])  # should be same!
             session.run(minimize_operation,
                         {model.batch_size: batch_size,
                          model.x: sample,

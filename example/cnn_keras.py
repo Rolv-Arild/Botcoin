@@ -67,7 +67,7 @@ model.add(Dense(64))
 model.add(BatchNormalization())
 model.add(LeakyReLU())
 model.add(Dense(5))
-#model.add(Activation('softmax'))
+model.add(Activation('softmax'))
 
 # # Compile model
 opt = Nadam(lr=0.002)
