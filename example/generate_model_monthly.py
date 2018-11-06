@@ -53,7 +53,6 @@ with tf.Session() as session:
                                                       model.x: sample_x,
                                                       model.y: sample_y,
                                                       model.in_state: zero_state}))
-            print("epoch %.d, time: %.d" % (epoch, time.time() - t))
 
         sample_x = [x[j:j + sample_size] for j in range(len(x_test)-sample_size)]
         sample_y = [y[j + sample_size] for j in range(len(x_test)-sample_size)]
@@ -69,3 +68,6 @@ with tf.Session() as session:
                                           model.x: x_test,
                                           model.y: y_test,
                                           model.in_state: zero_state}))
+
+        print("epoch %.d, time: %.d" % (epoch, time.time() - t))
+

@@ -1,6 +1,7 @@
 import bisect
 import datetime
 import pandas
+import numpy as np
 
 
 def normalize_data(data, from_zero=True):
@@ -51,12 +52,12 @@ def generate_classes(y, k):
     for i in range(len(y)):
         res.append([0.0] * k)
         val = y[i]
-        index = bisect.bisect_left(cutoffs, y[i])-1
+        index = bisect.bisect_left(cutoffs, y[i]) - 1
         res[i][index] = 1.0
     return res
 
 
-def get_data():
+def get_data(k):
     data = pandas.read_csv("../resources/bitstampUSD_1-min_data_2012-01-01_to_2018-06-27.csv", dtype='float64')
 
     # x = data.drop("Timestamp", 1)
@@ -77,10 +78,10 @@ def get_data():
     x = x[::60]
 
     y = find_increase(x, -1)
-    y = generate_classes(y, 3)
+    y = generate_classes(y, k)
     x = y[:-1]
     y = x[1:]
 
     # x = xn.values.tolist()
     # x = x[::60]
-    return x, y
+    return np.array(x), np.array(y)

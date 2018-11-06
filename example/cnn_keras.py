@@ -5,41 +5,29 @@ from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten, Convolution2D, LeakyReLU, BatchNormalization, Activation
 from keras.layers import Conv1D, MaxPooling1D
 from keras.optimizers import Nadam
-from util.util import find_increase, generate_classes
+from util.util import find_increase, generate_classes, get_data
 import numpy as np
 
 # Eksempelkode fra https://towardsdatascience.com/build-your-own-convolution-neural-network-in-5-mins-4217c2cf964f
 
 from util.util import find_increase
-#Read data from csv
-data = pandas.read_csv("../resources/bitstampUSD_1-min_data_2012-01-01_to_2018-06-27.csv", dtype='float64')
-#
-x = data.drop("Timestamp", 1)
 
-x = x.tail(len(x) - 2625376)
-maxes = x.max()
-x = x / maxes
+batch_size = 128
+epochs = 10
+num_classes = 5
+
+# Read data from csv
+x, y = get_data(num_classes)
 x = np.expand_dims(x, axis=2)
-# Normalize data
 
 cutoff = round(len(x) * 0.8)  # 80% training and 20% test data
 x_train = x[:cutoff]
 x_test = x[cutoff:-1]
 
-y = find_increase(x, -1)
-y = generate_classes(y, 5)
-y = np.array(y)
-print(y.shape)
-print(y)
-#y = np.squeeze(y, axis=1)
 y_train = y[:cutoff]
-#y_train = keras.utils.np_utils.to_categorical(y_train)
 y_test = y[cutoff:]
-batch_size = 128
-num_classes = 10
-epochs = 12
 
-# Data dimnesions
+# Data dimensions
 data_rows, data_cols = 2724686, 8
 
 print('x_train shape:', x_train.shape)
@@ -49,7 +37,7 @@ print(x_test.shape[0], 'test samples')
 # Sequential model from https://medium.com/machine-learning-world/neural-networks-for-algorithmic-trading-2-1-multivariate-time-series-ab016ce70f57
 model = Sequential()
 
-model.add(Conv1D(input_shape=(7, 1),
+model.add(Conv1D(input_shape=(num_classes, 1),
                  nb_filter=16,
                  filter_length=4,
                  border_mode='same'))
@@ -66,7 +54,7 @@ model.add(Flatten())
 model.add(Dense(64))
 model.add(BatchNormalization())
 model.add(LeakyReLU())
-model.add(Dense(5))
+model.add(Dense(num_classes))
 model.add(Activation('softmax'))
 
 # # Compile model
@@ -75,12 +63,12 @@ model.compile(optimizer=opt,
               loss='mean_squared_error',
               metrics=['accuracy'])
 
-reduce_lr = ReduceLROnPlateau(monitor='val_acc', factor=0.5, patience=30, min_lr=0.000001, verbose=1)
-checkpointer = ModelCheckpoint(filepath="model.hdf5", verbose=1, save_best_only=True)
+reduce_lr = ReduceLROnPlateau(monitor='val_acc', factor=0.9, patience=30, min_lr=0.000001, verbose=1)
+checkpointer = ModelCheckpoint(filepath="tmp/model.hdf5", verbose=1, save_best_only=True)
 
 history = model.fit(x_train, y_train,
-                    epochs=100,
-                    batch_size=128,
+                    epochs=epochs,
+                    batch_size=batch_size,
                     verbose=1,
                     validation_data=(x_test, y_test),
                     callbacks=[reduce_lr, checkpointer])

@@ -6,21 +6,20 @@ import time
 from example.simple_bitcoin_predictor import SimpleBitcoinPredictor
 from util.util import find_increase, generate_classes, get_data
 
-x, y = get_data()
+sample_size = 24 * 30
+batch_size = 100
+num_classes = 5
+num_features = num_classes
+
+x, y = get_data(num_classes)
 cutoff = round(len(x) * 0.8)  # 80% training and 20% test data
 x_train = x[:cutoff]
 y_train = y[:cutoff]
 
-num_features = len(x_train[0])
-alphabet_size = len(y_train[0])
-
-model = SimpleBitcoinPredictor(num_features, alphabet_size)
+model = SimpleBitcoinPredictor(num_features, num_classes)
 
 # Training: adjust the model so that its loss is minimized
-minimize_operation = tf.train.RMSPropOptimizer(0.01).minimize(model.loss)
-
-sample_size = 24 * 30
-batch_size = 100
+minimize_operation = tf.train.RMSPropOptimizer(0.001).minimize(model.loss)
 
 saver = tf.train.Saver()
 
