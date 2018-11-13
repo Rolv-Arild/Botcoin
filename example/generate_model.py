@@ -7,7 +7,7 @@ from example.simple_bitcoin_predictor import SimpleBitcoinPredictor
 from util.util import find_increase, generate_classes, get_data, get_full_data
 
 sample_size = 24 * 30
-batch_size = 100
+batch_size = 2000
 num_classes = 3
 num_features = 43
 
@@ -31,7 +31,7 @@ with tf.Session() as session:
     # Initialize model.in_state
     zero_state = session.run(model.in_state, {model.batch_size: batch_size})
 
-    for epoch in range(10):
+    for epoch in range(100):
         t = time.time()
         for i in range(0, batch_size * ((len(x_train) - sample_size) // batch_size), batch_size):
             sample = [x_train[i + j:i + j + sample_size + 1] for j in range(batch_size)]

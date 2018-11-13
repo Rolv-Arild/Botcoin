@@ -5,7 +5,7 @@ import tensorflow as tf
 
 from util.util import find_increase, generate_classes, get_data, get_full_data
 
-batch_size = 100
+batch_size = 2000
 num_classes = 3
 num_features = 43
 
