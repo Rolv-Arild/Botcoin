@@ -1,3 +1,5 @@
+import time
+
 import tensorflow as tf
 from tensorflow.python.ops.rnn import dynamic_rnn
 
@@ -41,3 +43,68 @@ class SimpleBitcoinPredictor:
         self.accuracy = tf.metrics.accuracy(tf.argmax(self.y, 1), tf.argmax(self.f, 1))
 
         self.conf_matrix = tf.confusion_matrix(tf.argmax(self.y, 1), tf.argmax(self.f, 1), dtype=dtype)
+
+
+def run_epoch(session, model, minimize_operation, batch_size, sample_size, x_train, y_train, count, prnt=True):
+    t = time.time()
+    mx = batch_size * ((len(x_train) - sample_size) // batch_size)
+    zero_state = session.run(model.in_state, {model.batch_size: batch_size})
+    for i in range(0, mx, batch_size):
+        sample = [x_train[i + j:i + j + sample_size + 1] for j in range(batch_size)]
+        sample_y = [y_train[i + j + sample_size] for j in range(batch_size)]
+        # print(sample[1][-1], sample_y[0])  # should be same!
+        session.run(minimize_operation,
+                    {model.batch_size: batch_size,
+                     model.x: sample,
+                     model.y: sample_y,
+                     model.in_state: zero_state})
+
+        if prnt:
+            print("i:", i, ", loss", session.run(model.loss,
+                                                 {model.batch_size: batch_size,
+                                                  model.x: sample,
+                                                  model.y: sample_y,
+                                                  model.in_state: zero_state}))
+    bs = len(x_train) - mx - sample_size
+    sample = [x_train[mx + j:mx + j + sample_size + 1] for j in range(bs)]
+    sample_y = [y_train[mx + j + sample_size] for j in range(bs)]
+    zero_state = session.run(model.in_state, {model.batch_size: bs})
+    # print(sample[1][-1], sample_y[0])  # should be same!
+    session.run(minimize_operation,
+                {model.batch_size: bs,
+                 model.x: sample,
+                 model.y: sample_y,
+                 model.in_state: zero_state})
+    if prnt:
+        print("i:", mx, ", loss", session.run(model.loss,
+                                              {model.batch_size: batch_size,
+                                               model.x: sample,
+                                               model.y: sample_y,
+                                               model.in_state: zero_state}))
+        print("epoch %.d, time: %.d" % (count, time.time() - t))
+
+
+def test_model(saver, session, model, sample_size, x_test, y_test, prnt=True):
+    saver.restore(session, "tmp/model.ckpt")
+    session.run(tf.local_variables_initializer())
+    zero_state = session.run(model.in_state, {model.batch_size: len(x_test) - sample_size - 1})
+    # Test model on test data
+    sample_x = [x_test[j:j + sample_size + 1] for j in range(len(x_test) - sample_size - 1)]
+    sample_y = [y_test[j + sample_size] for j in range(len(x_test) - sample_size - 1)]
+
+    acc = session.run(model.accuracy,
+                      {model.batch_size: len(x_test) - sample_size,
+                       model.x: sample_x,
+                       model.y: sample_y,
+                       model.in_state: zero_state})
+
+    confm = session.run(model.conf_matrix,
+                        {model.batch_size: len(x_test) - sample_size,
+                         model.x: sample_x,
+                         model.y: sample_y,
+                         model.in_state: zero_state})
+
+    print("accuracy", acc)
+    print("conf matrix", confm)
+
+    return acc, confm
