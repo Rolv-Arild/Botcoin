@@ -51,10 +51,37 @@ def generate_classes(y, k):
     res = []
     for i in range(len(y)):
         res.append([0.0] * k)
-        val = y[i]
         index = bisect.bisect_left(cutoffs, y[i]) - 1
         res[i][index] = 1.0
     return res
+
+
+def get_full_data(k):
+    data = pandas.read_csv("../resources/2017-present.csv", dtype='float64')
+
+    x = data.drop("Timestamp", 1)
+    # x = data.filter(["Weighted_Price"], axis=1)
+
+    # x = data.get_values().tolist()
+    # for r in x:
+    #     r.pop(0)
+
+    # Normalize data
+    maxes = x.max()
+    mins = x.min()
+    xn = (x - mins) / (maxes - mins)
+
+    x = x.values.tolist()
+    x = x[::60]
+
+    y = find_increase(x, 6)
+    y = generate_classes(y, k)
+    # x = y[:-1]
+    # y = x[1:]
+
+    x = xn.values.tolist()
+    x = x[::60]
+    return np.array(x), np.array(y)
 
 
 def get_data(k):

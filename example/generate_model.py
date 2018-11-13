@@ -4,14 +4,14 @@ import tensorflow as tf
 import time
 
 from example.simple_bitcoin_predictor import SimpleBitcoinPredictor
-from util.util import find_increase, generate_classes, get_data
+from util.util import find_increase, generate_classes, get_data, get_full_data
 
 sample_size = 24 * 30
 batch_size = 100
-num_classes = 5
-num_features = num_classes
+num_classes = 3
+num_features = 43
 
-x, y = get_data(num_classes)
+x, y = get_full_data(num_classes)
 cutoff = round(len(x) * 0.8)  # 80% training and 20% test data
 x_train = x[:cutoff]
 y_train = y[:cutoff]
