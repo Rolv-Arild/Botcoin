@@ -31,5 +31,5 @@ with tf.Session() as session:
     for epoch in range(100):
         run_epoch(session, model, minimize_operation, batch_size, sample_size, x_train, y_train, epoch)
 
-    save_path = saver.save(session, "tmp/model.ckpt")
+    save_path = saver.save(session, "tmp/lstm-model-hourly.ckpt")
     session.close()

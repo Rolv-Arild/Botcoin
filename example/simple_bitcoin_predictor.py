@@ -84,8 +84,8 @@ def run_epoch(session, model, minimize_operation, batch_size, sample_size, x_tra
         print("epoch %.d, time: %.d" % (count, time.time() - t))
 
 
-def test_model(saver, session, model, sample_size, x_test, y_test, prnt=True):
-    saver.restore(session, "tmp/model.ckpt")
+def test_model(saver, session, model, sample_size, x_test, y_test, filepath, prnt=True):
+    saver.restore(session, filepath)
     session.run(tf.local_variables_initializer())
     zero_state = session.run(model.in_state, {model.batch_size: len(x_test) - sample_size - 1})
     # Test model on test data

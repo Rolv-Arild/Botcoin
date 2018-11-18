@@ -73,7 +73,7 @@ def get_full_data(k):
     xn = (x - mins) / (maxes - mins)
 
     x = x.values.tolist()
-    #x = x[::60]
+    x = x[::60]
 
     y = find_increase(x, -1)
     y = generate_classes(y, k)
@@ -82,7 +82,7 @@ def get_full_data(k):
 
     xn = xn.drop("Weighted_Price", axis=1)
     x = xn.values.tolist()
-   # x = x[::60]
+    x = x[::60]
     return np.array(x), np.array(y)
 
 
