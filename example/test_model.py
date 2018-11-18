@@ -14,9 +14,9 @@ y_test = y[cutoff:]
 
 model = SimpleBitcoinPredictor(num_features, num_classes)
 
-sample_size = 24 * 30
+sample_size = 4 * 24 * 30
 
 saver = tf.train.Saver()
 
 with tf.Session() as session:
-    test_model(saver, session, model, sample_size, x_test, y_test, "tmp/lstm-model-hourly.ckpt")
+    test_model(saver, session, model, sample_size, x_test, y_test, "tmp/lstm-model-hourly.ckpt", 2)

@@ -21,4 +21,4 @@ sample_size = 24 * 30
 saver = tf.train.Saver()
 
 with tf.Session() as session:
-    test_model(saver, session, model, sample_size, x_test, y_test, "tmp/lstm-model-full.ckpt")
+    test_model(saver, session, model, sample_size, x_test, y_test, "tmp/lstm-model-full.ckpt", 2)

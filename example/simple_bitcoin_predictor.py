@@ -84,27 +84,49 @@ def run_epoch(session, model, minimize_operation, batch_size, sample_size, x_tra
         print("epoch %.d, time: %.d" % (count, time.time() - t))
 
 
-def test_model(saver, session, model, sample_size, x_test, y_test, filepath, prnt=True):
+def test_model(saver, session, model, sample_size, x_test, y_test, filepath, batches, prnt=True):
     saver.restore(session, filepath)
     session.run(tf.local_variables_initializer())
-    zero_state = session.run(model.in_state, {model.batch_size: len(x_test) - sample_size - 1})
-    # Test model on test data
-    sample_x = [x_test[j:j + sample_size + 1] for j in range(len(x_test) - sample_size - 1)]
-    sample_y = [y_test[j + sample_size] for j in range(len(x_test) - sample_size - 1)]
+
+    # Size of each batch
+    size = len(x_test) // batches - sample_size - 1
+    zero_state = session.run(model.in_state, {model.batch_size: size})
+
+    sample_x = [x_test[j:j + sample_size + 1] for j in range(size)]
+    sample_y = [y_test[j + sample_size] for j in range(size)]
 
     acc = session.run(model.accuracy,
-                      {model.batch_size: len(x_test) - sample_size,
+                      {model.batch_size: size,
                        model.x: sample_x,
                        model.y: sample_y,
-                       model.in_state: zero_state})
+                       model.in_state: zero_state})[1]
 
     confm = session.run(model.conf_matrix,
-                        {model.batch_size: len(x_test) - sample_size,
+                        {model.batch_size: size,
                          model.x: sample_x,
                          model.y: sample_y,
                          model.in_state: zero_state})
 
-    print("accuracy", acc)
-    print("conf matrix", confm)
+    for k in range(1, batches):
+        mn = k * len(x_test) // batches
+        mx = mn + size
+        sample_x = [x_test[j:j + sample_size + 1] for j in range(mn, mx)]
+        sample_y = [y_test[j + sample_size] for j in range(mn, mx)]
 
-    return acc, confm
+        acc += session.run(model.accuracy,
+                           {model.batch_size: size,
+                            model.x: sample_x,
+                            model.y: sample_y,
+                            model.in_state: zero_state})[1]
+
+        confm += session.run(model.conf_matrix,
+                             {model.batch_size: size,
+                              model.x: sample_x,
+                              model.y: sample_y,
+                              model.in_state: zero_state})
+
+    if prnt:
+        print("accuracy", acc / batches)
+        print("conf matrix", confm)
+
+    return acc / batches, confm

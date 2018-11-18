@@ -104,7 +104,7 @@ def get_data(k):
     # # xn = (x - mins) / (maxes - mins)
 
     x = x.values.tolist()
-    x = x[::60]
+    x = x[::15]
 
     y = find_increase(x, -1)
     y = generate_classes(y, k)
