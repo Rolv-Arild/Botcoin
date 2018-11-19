@@ -3,6 +3,8 @@ import datetime
 import pandas
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.collections import LineCollection
+from matplotlib.colors import ListedColormap, BoundaryNorm
 
 from example.simple_bitcoin_predictor import SimpleBitcoinPredictor
 
@@ -114,15 +116,27 @@ def get_data(k, interval):
 
     # x = xn.values.tolist()
     # x = x[::60]
-    return np.array(x), np.array(y)
+    return np.array(x), np.array(y), data
 
 
-def plot_prediction(session, model: SimpleBitcoinPredictor, data):
-    # preds = []
-    for i in range(1, len(data) - 1):
-        p = session.run(model.f, {model.batch_size: 1, model.x: [data[:i]]})
-        g = np.argmax(p) / len(p)
-        r = 1 - g
-        # preds.append([r, g])
-        plt.plot(xdata=data[i:i + 1], color=(r, g, 0))
+def plot_prediction(session, model: SimpleBitcoinPredictor, data, x, y):
+    global p
+    preds = np.array([])
+    for i in range(1, len(data)):
+        p = session.run(model.f, {model.batch_size: 1, model.x: [data[:i]]})[0]
+        np.append(preds, np.argmax(p))
+
+    points = np.array([x, y]).T.reshape(-1, 1, 2)
+    segments = np.concatenate([points[:-1], points[1:]], axis=1)
+    fig, ax = plt.subplots()
+
+    cmap = ListedColormap([[1 - n / len(p), n / len(p), 0, 1] for n in range(len(p))])
+    norm = BoundaryNorm(range(len(p)), cmap.N)
+    lc = LineCollection(segments, cmap=cmap, norm=norm)
+    lc.set_array(y)
+    lc.set_linewidth(2)
+    line = ax.add_collection(lc)
+    fig.colorbar(line, ax=ax)
+    ax.set_xlim(x.min(), x.max())
+    ax.set_ylim(y.min(), y.max())
     plt.show()
