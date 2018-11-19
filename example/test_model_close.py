@@ -1,15 +1,18 @@
+import numpy
+import pandas
 import tensorflow as tf
+import time
 import matplotlib.pyplot as plt
 
 from example.simple_bitcoin_predictor import SimpleBitcoinPredictor, run_epoch, test_model
-from util.util import get_full_data
+from util.util import find_increase, generate_classes, get_data, get_full_data
 
 sample_size = 24 * 30
 batch_size = 2000
 num_classes = 3
-num_features = 43
+num_features = 3
 
-x, y = get_full_data(num_classes, 60)
+x, y = get_data(num_classes, 60)
 cutoff = round(len(x) * 0.8)  # 80% training and 20% test data
 x_train = x[:cutoff]
 y_train = y[:cutoff]
@@ -31,13 +34,13 @@ with tf.Session() as session:
 
     for epoch in range(100):
         run_epoch(session, model, minimize_operation, batch_size, sample_size, x_train, y_train, epoch)
-        save_path = saver.save(session, "tmp/lstm-model-full.ckpt")
+        save_path = saver.save(session, "tmp/lstm-model-close.ckpt")
         acc.append(test_model(saver, session, model, sample_size, x_test, y_test, save_path, 1)[0])
 
     session.close()
 
 plt.plot(acc)
-plt.title("LSTM accuracy (full dataset)")
+plt.title("LSTM accuracy (just price)")
 plt.xlabel("Epoch")
 plt.ylabel("Accuracy")
 plt.show()

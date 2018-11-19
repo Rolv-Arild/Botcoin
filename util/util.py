@@ -2,6 +2,9 @@ import bisect
 import datetime
 import pandas
 import numpy as np
+import matplotlib.pyplot as plt
+
+from example.simple_bitcoin_predictor import SimpleBitcoinPredictor
 
 
 def normalize_data(data, from_zero=True):
@@ -59,8 +62,8 @@ def generate_classes(y, k):
 def get_full_data(k, interval):
     data = pandas.read_csv("../resources/2017-present.csv", dtype='float64')
 
-    # x = data.drop("Timestamp", 1)
-    x = data.filter(["Trend", "High_USD", "Change_USD", "Weighted_Price"], axis=1)
+    x = data.drop("Timestamp", 1)
+    # x = data.filter(["Trend", "High_USD", "Change_USD", "Weighted_Price"], axis=1)
     # x = data.filter(["Weighted_Price"], axis=1)
 
     # x = data.get_values().tolist()
@@ -75,28 +78,26 @@ def get_full_data(k, interval):
     x = x.values.tolist()
     x = x[::interval]
 
-    y = find_increase(x, -1)
+    y = find_increase(x, 6)
     y = generate_classes(y, k)
     # x = y[:-1]
     # y = x[1:]
 
-    xn = xn.drop("Weighted_Price", axis=1)
+    # xn = xn.drop("Weighted_Price", axis=1)
     x = xn.values.tolist()
     x = x[::interval]
     return np.array(x), np.array(y)
 
 
 def get_data(k, interval):
-    data = pandas.read_csv("../resources/bitstampUSD_1-min_data_2012-01-01_to_2018-06-27.csv", dtype='float64')
+    data = pandas.read_csv("../resources/2017-present.csv", dtype='float64')
 
     # x = data.drop("Timestamp", 1)
-    x = data.filter(["Weighted_Price"], axis=1)
+    x = data.filter(["Close"], axis=1)
 
     # x = data.get_values().tolist()
     # for r in x:
     #     r.pop(0)
-
-    x = x.tail(len(x) - 2625376)  # start of 2017
 
     # Normalize data
     # maxes = x.max()
@@ -106,7 +107,7 @@ def get_data(k, interval):
     x = x.values.tolist()
     x = x[::interval]
 
-    y = find_increase(x, -1)
+    y = find_increase(x, 0)
     y = generate_classes(y, k)
     x = y[:-1]
     y = x[1:]
@@ -114,3 +115,14 @@ def get_data(k, interval):
     # x = xn.values.tolist()
     # x = x[::60]
     return np.array(x), np.array(y)
+
+
+def plot_prediction(session, model: SimpleBitcoinPredictor, data):
+    # preds = []
+    for i in range(1, len(data) - 1):
+        p = session.run(model.f, {model.batch_size: 1, model.x: [data[:i]]})
+        g = np.argmax(p) / len(p)
+        r = 1 - g
+        # preds.append([r, g])
+        plt.plot(xdata=data[i:i + 1], color=(r, g, 0))
+    plt.show()

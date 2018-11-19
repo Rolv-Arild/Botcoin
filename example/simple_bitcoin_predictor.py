@@ -65,7 +65,7 @@ def run_epoch(session, model, minimize_operation, batch_size, sample_size, x_tra
                                                   model.x: sample,
                                                   model.y: sample_y,
                                                   model.in_state: zero_state}))
-    bs = len(x_train) - mx - sample_size
+    bs = len(x_train) - mx - sample_size - 1
     sample = [x_train[mx + j:mx + j + sample_size + 1] for j in range(bs)]
     sample_y = [y_train[mx + j + sample_size] for j in range(bs)]
     zero_state = session.run(model.in_state, {model.batch_size: bs})
