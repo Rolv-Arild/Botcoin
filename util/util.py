@@ -56,7 +56,7 @@ def generate_classes(y, k):
     return res
 
 
-def get_full_data(k):
+def get_full_data(k, interval):
     data = pandas.read_csv("../resources/2017-present.csv", dtype='float64')
 
     # x = data.drop("Timestamp", 1)
@@ -73,7 +73,7 @@ def get_full_data(k):
     xn = (x - mins) / (maxes - mins)
 
     x = x.values.tolist()
-    x = x[::60]
+    x = x[::interval]
 
     y = find_increase(x, -1)
     y = generate_classes(y, k)
@@ -82,11 +82,11 @@ def get_full_data(k):
 
     xn = xn.drop("Weighted_Price", axis=1)
     x = xn.values.tolist()
-    x = x[::60]
+    x = x[::interval]
     return np.array(x), np.array(y)
 
 
-def get_data(k):
+def get_data(k, interval):
     data = pandas.read_csv("../resources/bitstampUSD_1-min_data_2012-01-01_to_2018-06-27.csv", dtype='float64')
 
     # x = data.drop("Timestamp", 1)
@@ -104,7 +104,7 @@ def get_data(k):
     # # xn = (x - mins) / (maxes - mins)
 
     x = x.values.tolist()
-    x = x[::15]
+    x = x[::interval]
 
     y = find_increase(x, -1)
     y = generate_classes(y, k)

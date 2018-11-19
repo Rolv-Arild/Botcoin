@@ -10,7 +10,7 @@ batch_size = 100
 num_features = 3
 alphabet_size = 3
 
-x, y = get_data(3)
+x, y = get_data(3, 60)
 cutoff = round(sample_size * 0.8)  # 80% training and 20% test data
 x_split = [x[i:i + sample_size] for i in range(0, 18 * sample_size, sample_size)]  # split into 30 day intervals
 y_split = [y[i:i + sample_size] for i in range(0, 18 * sample_size, sample_size)]  # split into 30 day intervals

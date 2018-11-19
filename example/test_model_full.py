@@ -9,7 +9,7 @@ from util.util import find_increase, generate_classes, get_data, get_full_data
 num_classes = 3
 num_features = 3
 
-x, y = get_full_data(num_classes)
+x, y = get_full_data(num_classes, 60)
 cutoff = round(len(x) * 0.8)  # 80% training and 20% test data
 x_test = x[cutoff:]
 y_test = y[cutoff:]

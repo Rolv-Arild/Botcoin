@@ -17,7 +17,7 @@ epochs = 10
 num_classes = 3
 
 # Read data from csv
-x, y = get_full_data(num_classes)
+x, y = get_full_data(num_classes, 60)
 x = np.expand_dims(x, axis=2)
 
 cutoff = round(len(x) * 0.8)  # 80% training and 20% test data
