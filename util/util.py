@@ -202,7 +202,9 @@ def get_reduced_data(k, interval):
     else:
         data = get_data_average(interval)
 
-    x = data.filter(["Trend", "Change_USD", "High_USD", "Close"], axis=1).pct_change().fillna(0).replace(
+    cusd = data.filter(["Change_USD"], axis=1)
+    x = data.filter(["Trend", "High_USD", "Close"], axis=1).pct_change()
+    x = pandas.concat([x, cusd], sort=True).fillna(0).replace(
         [float('Inf'), -float('Inf')], 0)
 
     # Normalize data
