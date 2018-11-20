@@ -171,6 +171,8 @@ def get_data_average(interval):
 
         trend = x.loc[r]["Trend"]
         change_usd = x.loc[r]["Change_USD"]
+        price_usd = x.loc[r]["Price_USD"]
+        gold_usd = x.loc[r]["Gold_USD"]
 
         newRow = pandas.DataFrame(
             {"Open": [open_btc], "Open_BTC": [open_btc_usdt], "Open_ETH": [open_eth], "Open_LTC": [open_ltc],
@@ -183,7 +185,8 @@ def get_data_average(interval):
              "Close_XRP": [close_xrp], "Close_DJI": [close_dji], "Volume_.BTC.": [volume_btc],
              "Volume_.Currency.": [volume_btc_cur], "Volume_BTC": [volume_btc_usdt], "Volume_ETH": [volume_eth],
              "Volume_LTC": [volume_ltc], "Volume_XRP": [volume_xrp], "Volume_DJI": [volume_dji],
-             "Volume_USD": [volume_usd], "Trend": [trend], "Change_USD": [change_usd]}, )
+             "Volume_USD": [volume_usd], "Trend": [trend], "Change_USD": [change_usd], "Price_USD": [price_usd],
+             "gold_USD": [gold_usd]}, )
         newlist = pandas.concat([newlist, newRow], sort=True)
 
     return newlist
