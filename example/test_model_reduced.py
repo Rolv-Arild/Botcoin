@@ -19,7 +19,7 @@ y_test = y[cutoff:]
 model = SimpleBitcoinPredictor(num_features, num_classes)
 
 # Training: adjust the model so that its loss is minimized
-minimize_operation = tf.train.RMSPropOptimizer(0.0001).minimize(model.loss)
+minimize_operation = tf.train.RMSPropOptimizer(0.01).minimize(model.loss)
 
 saver = tf.train.Saver()
 

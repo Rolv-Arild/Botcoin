@@ -25,13 +25,10 @@ x = np.expand_dims(x, axis=2)
 
 cutoff = round(len(x) * 0.8)  # 80% training and 20% test data
 x_train = x[:cutoff]
-x_test = x[cutoff:-1]
+x_test = x[cutoff:]
 
 y_train = y[:cutoff]
 y_test = y[cutoff:]
-
-# Data dimensions
-data_rows, data_cols = 2724686, 8
 
 print('x_train shape:', x_train.shape)
 print(x_train.shape[0], 'train samples')
