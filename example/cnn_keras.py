@@ -1,5 +1,8 @@
 import keras
 import pandas
+import matplotlib.pyplot as plt
+import os
+os.environ["PATH"] += os.pathsep + 'C:/Program Files (x86)/Graphviz2.38/bin/'
 from keras.callbacks import ReduceLROnPlateau, ModelCheckpoint
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten, Convolution2D, LeakyReLU, BatchNormalization, Activation
@@ -13,11 +16,11 @@ import numpy as np
 from util.util import find_increase
 
 batch_size = 128
-epochs = 10
+epochs = 100
 num_classes = 3
 
 # Read data from csv
-x, y = get_full_data(num_classes, 60)
+x, y = get_full_data(43, 1)
 x = np.expand_dims(x, axis=2)
 
 cutoff = round(len(x) * 0.8)  # 80% training and 20% test data
@@ -54,7 +57,7 @@ model.add(Flatten())
 model.add(Dense(64))
 model.add(BatchNormalization())
 model.add(LeakyReLU())
-model.add(Dense(num_classes))
+model.add(Dense(43))
 model.add(Activation('softmax'))
 
 # # Compile model
@@ -76,3 +79,13 @@ history = model.fit(x_train, y_train,
 score = model.evaluate(x_test, y_test, verbose=0)
 print('Test loss:', score[0])
 print('Test accuracy:', score[1])
+
+model.predict(x_test, verbose=1)
+
+plt.plot(history.history['acc'])
+plt.plot(history.history['val_acc'])
+plt.title('CNN Model accuracy ( 1min full dataset)')
+plt.ylabel('Accuracy')
+plt.xlabel('Epoch')
+plt.legend(['Train', 'Test'], loc='upper left')
+plt.show()
