@@ -62,60 +62,32 @@ def generate_classes(y, k):
 
 
 def get_full_data(k, interval):
-    data = pandas.read_csv("../resources/2017-present.csv", dtype='float64')
+    global data
+    if interval == 1:
+        data = pandas.read_csv("../resources/2017-present.csv", dtype='float64')
+        data = data.drop("Timestamp", 1)
+    elif interval == 60:
+        data = pandas.read_csv("../resources/2017-present-1hour.csv", dtype='float64')
+    elif interval == 24 * 60:
+        data = pandas.read_csv("../resources/2017-present-1day.csv", dtype='float64')
+    else:
+        data = get_data_average(interval)
 
-    x = data.drop("Timestamp", 1)
-    # x = data.filter(["Trend", "High_USD", "Change_USD", "Weighted_Price"], axis=1)
-    # x = data.filter(["Weighted_Price"], axis=1)
-
-    # x = data.get_values().tolist()
-    # for r in x:
-    #     r.pop(0)
+    x = data.copy()
 
     # Normalize data
     maxes = x.max()
     mins = x.min()
     xn = (x - mins) / (maxes - mins)
 
+    index = x.columns.get_loc("Close")
     x = x.values.tolist()
-    x = x[::interval]
 
-    y = find_increase(x, 6)
+    y = find_increase(x, index)
     y = generate_classes(y, k)
-    # x = y[:-1]
-    # y = x[1:]
 
-    # xn = xn.drop("Weighted_Price", axis=1)
     x = xn.values.tolist()
-    x = x[::interval]
-    return np.array(x), np.array(y)
 
-
-def get_data(k, interval):
-    data = pandas.read_csv("../resources/2017-present.csv", dtype='float64')
-
-    # x = data.drop("Timestamp", 1)
-    x = data.filter(["Close"], axis=1)
-
-    # x = data.get_values().tolist()
-    # for r in x:
-    #     r.pop(0)
-
-    # Normalize data
-    # maxes = x.max()
-    # mins = x.min()
-    # # xn = (x - mins) / (maxes - mins)
-
-    x = x.values.tolist()
-    x = x[::interval]
-
-    y = find_increase(x, 0)
-    y = generate_classes(y, k)
-    x = y[:-1]
-    y = x[1:]
-
-    # x = xn.values.tolist()
-    # x = x[::60]
     return np.array(x), np.array(y), data
 
 
@@ -192,28 +164,57 @@ def get_data_average(interval):
     return newlist
 
 
-df = get_data_average(60 * 24)
-df.to_csv('2017-present-1day', index=False)
+def get_data(k, interval):
+    data = pandas.read_csv("../resources/2017-present.csv", dtype='float64')[::interval]
+
+    # x = data.drop("Timestamp", 1)
+    x = data.filter(["Close"], axis=1)
+
+    # x = data.get_values().tolist()
+    # for r in x:
+    #     r.pop(0)
+
+    # Normalize data
+    # maxes = x.max()
+    # mins = x.min()
+    # # xn = (x - mins) / (maxes - mins)
+
+    x = x.values.tolist()
+    # x = x[::interval]
+
+    y = find_increase(x, 0)
+    y = generate_classes(y, k)
+    x = y[:-1]
+    y = x[1:]
+
+    # x = xn.values.tolist()
+    # x = x[::60]
+    return np.array(x), np.array(y), data
 
 
-def plot_prediction(session, model: SimpleBitcoinPredictor, data, x, y):
+def plot_prediction(session, model, sample_size, data, x, y):
     global p
-    preds = np.array([])
-    for i in range(1, len(data)):
-        p = session.run(model.f, {model.batch_size: 1, model.x: [data[:i]]})[0]
-        np.append(preds, np.argmax(p))
+    preds = []
+    for i in range(len(data)):
+        p = session.run(model.f, {model.batch_size: 1, model.x: [data[:i + 1]]})[0]
+        preds.append(np.argmax(p))
 
     points = np.array([x, y]).T.reshape(-1, 1, 2)
     segments = np.concatenate([points[:-1], points[1:]], axis=1)
     fig, ax = plt.subplots()
 
-    cmap = ListedColormap([[1 - n / len(p), n / len(p), 0, 1] for n in range(len(p))])
-    norm = BoundaryNorm(range(len(p)), cmap.N)
+    cmap = ListedColormap(['r', 'y', 'g'])
+    norm = BoundaryNorm([(len(p) - 1) * i / len(p) for i in range(len(p) + 1)], cmap.N)
     lc = LineCollection(segments, cmap=cmap, norm=norm)
-    lc.set_array(y)
+    lc.set_array(np.array(preds))
     lc.set_linewidth(2)
     line = ax.add_collection(lc)
     fig.colorbar(line, ax=ax)
     ax.set_xlim(x.min(), x.max())
     ax.set_ylim(y.min(), y.max())
+
+    plt.title("LSTM prediction (just close)")
+    plt.xlabel("Day")
+    plt.ylabel("Price")
+
     plt.show()

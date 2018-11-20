@@ -12,12 +12,12 @@ batch_size = 2000
 num_classes = 3
 num_features = 3
 
-x, y, data = get_data(num_classes, 24*60)
+x, y, data = get_data(num_classes, 24 * 60)
 
 model = SimpleBitcoinPredictor(num_features, num_classes)
 
 # Training: adjust the model so that its loss is minimized
-minimize_operation = tf.train.RMSPropOptimizer(0.001).minimize(model.loss)
+minimize_operation = tf.train.RMSPropOptimizer(0.01).minimize(model.loss)
 
 saver = tf.train.Saver()
 
@@ -27,13 +27,14 @@ with tf.Session() as session:
     # Initialize tf.Variable objects
     session.run(tf.global_variables_initializer())
 
-    for epoch in range(10):
+    for epoch in range(1000):
         run_epoch(session, model, minimize_operation, batch_size, sample_size, x, y, epoch)
+        # test_model(saver, session, model, sample_size, x, y, save_path, 1)
 
     save_path = saver.save(session, "tmp/lstm-model-close.ckpt")
 
     ys = np.array(data.filter(["Close"], axis=1).values.tolist())
     ys = ys.reshape([len(ys)])
-    plot_prediction(session, model, x, np.arange(0, len(data)), ys)
+    plot_prediction(session, model, sample_size, x, np.arange(0, len(data)), ys)
 
     session.close()
