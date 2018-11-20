@@ -192,7 +192,37 @@ def get_data(k, interval):
     return np.array(x), np.array(y), data
 
 
-def plot_prediction(session, model, sample_size, data, x, y):
+def get_reduced_data(k, interval):
+    global data
+    if interval == 1:
+        data = pandas.read_csv("../resources/2017-present.csv", dtype='float64')
+        data = data.drop("Timestamp", 1)
+    elif interval == 60:
+        data = pandas.read_csv("../resources/2017-present-1hour.csv", dtype='float64')
+    elif interval == 24 * 60:
+        data = pandas.read_csv("../resources/2017-present-1day.csv", dtype='float64')
+    else:
+        data = get_data_average(interval)
+
+    x = data.filter(["Trend", "Change_USD", "High_USD", "Close"], axis=1)
+
+    # Normalize data
+    maxes = x.max()
+    mins = x.min()
+    xn = (x - mins) / (maxes - mins)
+
+    index = x.columns.get_loc("Close")
+    x = x.values.tolist()
+
+    y = find_increase(x, index)
+    y = generate_classes(y, k)
+
+    x = xn.drop("Close", 1).values.tolist()
+
+    return np.array(x), np.array(y), data
+
+
+def plot_prediction(session, model, title, data, x, y):
     global p
     preds = []
     for i in range(len(data)):
@@ -213,7 +243,7 @@ def plot_prediction(session, model, sample_size, data, x, y):
     ax.set_xlim(x.min(), x.max())
     ax.set_ylim(y.min(), y.max())
 
-    plt.title("LSTM prediction (just close)")
+    plt.title(title)
     plt.xlabel("Day")
     plt.ylabel("Price")
 

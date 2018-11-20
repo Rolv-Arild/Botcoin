@@ -20,7 +20,7 @@ epochs = 100
 num_classes = 3
 
 # Read data from csv
-x, y = get_full_data(43, 1)
+x, y, data = get_full_data(num_classes, 60)
 x = np.expand_dims(x, axis=2)
 
 cutoff = round(len(x) * 0.8)  # 80% training and 20% test data
@@ -30,9 +30,6 @@ x_test = x[cutoff:-1]
 y_train = y[:cutoff]
 y_test = y[cutoff:]
 
-# Data dimensions
-data_rows, data_cols = 2724686, 8
-
 print('x_train shape:', x_train.shape)
 print(x_train.shape[0], 'train samples')
 print(x_test.shape[0], 'test samples')
@@ -40,7 +37,7 @@ print(x_test.shape[0], 'test samples')
 # Sequential model from https://medium.com/machine-learning-world/neural-networks-for-algorithmic-trading-2-1-multivariate-time-series-ab016ce70f57
 model = Sequential()
 
-model.add(Conv1D(input_shape=(43, 1),
+model.add(Conv1D(input_shape=(42, 1),
                  nb_filter=16,
                  filter_length=4,
                  border_mode='same'))
@@ -57,7 +54,7 @@ model.add(Flatten())
 model.add(Dense(64))
 model.add(BatchNormalization())
 model.add(LeakyReLU())
-model.add(Dense(43))
+model.add(Dense(42))
 model.add(Activation('softmax'))
 
 # # Compile model

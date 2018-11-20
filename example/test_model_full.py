@@ -19,7 +19,7 @@ y_test = y[cutoff:]
 model = SimpleBitcoinPredictor(num_features, num_classes)
 
 # Training: adjust the model so that its loss is minimized
-minimize_operation = tf.train.RMSPropOptimizer(0.00001).minimize(model.loss)
+minimize_operation = tf.train.RMSPropOptimizer(0.0001).minimize(model.loss)
 
 saver = tf.train.Saver()
 
@@ -31,13 +31,13 @@ with tf.Session() as session:
 
     for epoch in range(100):
         run_epoch(session, model, minimize_operation, batch_size, sample_size, x_train, y_train, epoch)
-        save_path = saver.save(session, "tmp/lstm-model-full.ckpt")
+        save_path = saver.save(session, "tmp/lstm-model-full-1hour.ckpt")
         acc.append(test_model(saver, session, model, sample_size, x_test, y_test, save_path, 1)[0])
 
     session.close()
 
 plt.plot(acc)
-plt.title("LSTM accuracy (full dataset)")
+plt.title("LSTM accuracy (1 hour full dataset)")
 plt.xlabel("Epoch")
 plt.ylabel("Accuracy")
 plt.show()

@@ -31,10 +31,10 @@ with tf.Session() as session:
         run_epoch(session, model, minimize_operation, batch_size, sample_size, x, y, epoch)
         # test_model(saver, session, model, sample_size, x, y, save_path, 1)
 
-    save_path = saver.save(session, "tmp/lstm-model-close.ckpt")
+    save_path = saver.save(session, "tmp/lstm-model-close-1day.ckpt")
 
     ys = np.array(data.filter(["Close"], axis=1).values.tolist())
     ys = ys.reshape([len(ys)])
-    plot_prediction(session, model, sample_size, x, np.arange(0, len(data)), ys)
+    plot_prediction(session, model, "LSTM prediction (1 day close only)", x, np.arange(0, len(data)), ys)
 
     session.close()
