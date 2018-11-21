@@ -8,7 +8,7 @@ from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten, Convolution2D, LeakyReLU, BatchNormalization, Activation
 from keras.layers import Conv1D, MaxPooling1D
 from keras.optimizers import Nadam
-from util.util import find_increase, generate_classes, get_data, get_full_data
+from util.util import find_increase, generate_classes, get_data, get_full_data, get_reduced_data
 import numpy as np
 
 # Eksempelkode fra https://towardsdatascience.com/build-your-own-convolution-neural-network-in-5-mins-4217c2cf964f
@@ -20,7 +20,7 @@ epochs = 1000
 num_classes = 3
 
 # Read data from csv
-x, y, data = get_full_data(3, 60)
+x, y, data = get_data(3, 60)
 x = np.expand_dims(x, axis=2)
 
 cutoff = round(len(x) * 0.8)  # 80% training and 20% test data
@@ -40,7 +40,7 @@ print(x_test.shape[0], 'test samples')
 # Sequential model from https://medium.com/machine-learning-world/neural-networks-for-algorithmic-trading-2-1-multivariate-time-series-ab016ce70f57
 model = Sequential()
 
-model.add(Conv1D(input_shape=(42, 1),
+model.add(Conv1D(input_shape=(3, 1),
                  nb_filter=16,
                  filter_length=4,
                  border_mode='same'))
@@ -61,7 +61,7 @@ model.add(Dense(3))
 model.add(Activation('softmax'))
 
 # # Compile model
-opt = Nadam(lr=0.0002)
+opt = Nadam(lr=0.002)
 model.compile(optimizer=opt,
               loss='mean_squared_error',
               metrics=['accuracy'])
@@ -82,7 +82,7 @@ print('Test accuracy:', max(history.history['val_acc']))
 #model.predict(x_test, verbose=1)
 
 plt.plot(history.history['val_acc'])
-plt.title('CNN Model accuracy (1hour full dataset)')
+plt.title('CNN Model accuracy (1h close only)')
 plt.ylabel('Accuracy')
 plt.xlabel('Epoch')
 plt.show()
