@@ -1,11 +1,8 @@
 import numpy as np
-import pandas
 import tensorflow as tf
-import time
-import matplotlib.pyplot as plt
 
-from example.simple_bitcoin_predictor import SimpleBitcoinPredictor, run_epoch, test_model
-from util.util import find_increase, generate_classes, get_data, get_full_data, plot_prediction
+from src.simple_bitcoin_predictor import SimpleBitcoinPredictor, run_epoch
+from src.util.util import get_data, plot_prediction
 
 sample_size = 30
 batch_size = 2000
@@ -31,7 +28,7 @@ with tf.Session() as session:
         run_epoch(session, model, minimize_operation, batch_size, sample_size, x, y, epoch)
         # test_model(saver, session, model, sample_size, x, y, save_path, 1)
 
-    save_path = saver.save(session, "tmp/lstm-model-close-1day.ckpt")
+    save_path = saver.save(session, "../resources/tmp/lstm-model-close-1day.ckpt")
 
     ys = np.array(data.filter(["Close"], axis=1).values.tolist())
     ys = ys.reshape([len(ys)])

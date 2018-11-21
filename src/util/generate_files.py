@@ -1,4 +1,4 @@
-from util import get_data_average
+from src.util import get_data_average
 
 df = get_data_average(60)
 df.to_csv('../resources/2017-present-1hour.csv', index=False)

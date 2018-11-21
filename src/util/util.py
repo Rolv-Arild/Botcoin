@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from matplotlib.collections import LineCollection
 from matplotlib.colors import ListedColormap, BoundaryNorm
 
-from example.simple_bitcoin_predictor import SimpleBitcoinPredictor
+from src.simple_bitcoin_predictor import SimpleBitcoinPredictor
 
 
 def normalize_data(data, from_zero=True):
@@ -73,20 +73,11 @@ def get_full_data(k, interval):
     else:
         data = get_data_average(interval)
 
-    x = data.copy()
+    x = data.pct_change().fillna(0).replace([float('Inf'), -float('Inf')], 0)
 
-    # Normalize data
-    maxes = x.max()
-    mins = x.min()
-    xn = (x - mins) / (maxes - mins)
-
-    index = x.columns.get_loc("Close")
-    x = x.values.tolist()
-
-    y = find_increase(x, index)
+    y = x.filter(["Close"], axis=1).values.tolist()[2:]
+    x = x.values.tolist()[1:-1]
     y = generate_classes(y, k)
-
-    x = xn.values.tolist()
 
     return np.array(x), np.array(y), data
 
@@ -95,7 +86,6 @@ def get_data_average(interval):
     data = pandas.read_csv("../resources/2017-present.csv", dtype='float64')
     x = data.drop("Timestamp", 1)
     x = x.drop("Weighted_Price", 1)
-    # x = x.values.tolist()
     newlist = pandas.DataFrame(columns=x.columns)
     for r in range(0, len(x) - interval, interval):
         open_btc = x.loc[r]["Open"]
@@ -167,28 +157,13 @@ def get_data_average(interval):
 def get_data(k, interval):
     data = pandas.read_csv("../resources/2017-present.csv", dtype='float64')[::interval]
 
-    # x = data.drop("Timestamp", 1)
-    x = data.filter(["Close"], axis=1)
+    x = data.filter(["Close"], axis=1).pct_change().fillna(0).replace([float('Inf'), -float('Inf')], 0)
 
-    # x = data.get_values().tolist()
-    # for r in x:
-    #     r.pop(0)
-
-    # Normalize data
-    # maxes = x.max()
-    # mins = x.min()
-    # # xn = (x - mins) / (maxes - mins)
-
-    x = x.values.tolist()
-    # x = x[::interval]
-
-    y = find_increase(x, 0)
+    y = x.filter(["Close"], axis=1).values.tolist()[1:]
     y = generate_classes(y, k)
     x = y[:-1]
     y = x[1:]
 
-    # x = xn.values.tolist()
-    # x = x[::60]
     return np.array(x), np.array(y), data
 
 
@@ -204,20 +179,12 @@ def get_reduced_data(k, interval):
     else:
         data = get_data_average(interval)
 
-    x = data.filter(["Trend", "Change_USD", "High_USD", "Close"], axis=1)
+    x = data.filter(["Trend", "High_USD", "Close", "Change_USD"], axis=1).pct_change().fillna(0).replace(
+        [float('Inf'), -float('Inf')], 0)
 
-    # Normalize data
-    maxes = x.max()
-    mins = x.min()
-    xn = (x - mins) / (maxes - mins)
-
-    index = x.columns.get_loc("Close")
-    x = x.values.tolist()
-
-    y = find_increase(x, index)
+    y = x.filter(["Close"], axis=1).values.tolist()[2:]
+    x = x.drop("Close", 1).values.tolist()[1:-1]
     y = generate_classes(y, k)
-
-    x = xn.drop("Close", 1).values.tolist()
 
     return np.array(x), np.array(y), data
 
