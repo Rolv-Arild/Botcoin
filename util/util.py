@@ -75,20 +75,9 @@ def get_full_data(k, interval):
 
     x = data.pct_change().fillna(0).replace([float('Inf'), -float('Inf')], 0)
 
-    # Normalize data
-    # maxes = x.max()
-    # mins = x.min()
-    # x = (x - mins) / (maxes - mins)
-
-    # index = x.columns.get_loc("Close")
-    # x = x.values.tolist()
-
     y = x.filter(["Close"], axis=1).values.tolist()[2:]
     x = x.values.tolist()[1:-1]
-    # y = find_increase(x, index)
     y = generate_classes(y, k)
-
-    # x = x.values.tolist()
 
     return np.array(x), np.array(y), data
 
@@ -97,7 +86,6 @@ def get_data_average(interval):
     data = pandas.read_csv("../resources/2017-present.csv", dtype='float64')
     x = data.drop("Timestamp", 1)
     x = x.drop("Weighted_Price", 1)
-    # x = x.values.tolist()
     newlist = pandas.DataFrame(columns=x.columns)
     for r in range(0, len(x) - interval, interval):
         open_btc = x.loc[r]["Open"]
@@ -169,23 +157,12 @@ def get_data_average(interval):
 def get_data(k, interval):
     data = pandas.read_csv("../resources/2017-present.csv", dtype='float64')[::interval]
 
-    # x = data.drop("Timestamp", 1)
     x = data.filter(["Close"], axis=1).pct_change().fillna(0).replace([float('Inf'), -float('Inf')], 0)
 
-    # Normalize data
-    # maxes = x.max()
-    # mins = x.min()
-    # x = (x - mins) / (maxes - mins)
-
-    # index = x.columns.get_loc("Close")
-    # x = x.values.tolist()
-
-    y = x.filter(["Close"], axis=1).values.tolist()[2:]
-    x = x.values.tolist()[1:-1]
-    # y = find_increase(x, index)
+    y = x.filter(["Close"], axis=1).values.tolist()[1:]
     y = generate_classes(y, k)
-
-    # x = x.values.tolist()
+    x = y[:-1]
+    y = x[1:]
 
     return np.array(x), np.array(y), data
 
@@ -202,25 +179,12 @@ def get_reduced_data(k, interval):
     else:
         data = get_data_average(interval)
 
-    cusd = data.filter(["Change_USD"], axis=1)
-    x = data.filter(["Trend", "High_USD", "Close"], axis=1).pct_change()
-    x = pandas.concat([x, cusd], sort=True).fillna(0).replace(
+    x = data.filter(["Trend", "High_USD", "Close", "Change_USD"], axis=1).pct_change().fillna(0).replace(
         [float('Inf'), -float('Inf')], 0)
-
-    # Normalize data
-    # maxes = x.max()
-    # mins = x.min()
-    # x = (x - mins) / (maxes - mins)
-
-    # index = x.columns.get_loc("Close")
-    # x = x.values.tolist()
 
     y = x.filter(["Close"], axis=1).values.tolist()[2:]
     x = x.drop("Close", 1).values.tolist()[1:-1]
-    # y = find_increase(x, index)
     y = generate_classes(y, k)
-
-    # x = x.values.tolist()
 
     return np.array(x), np.array(y), data
 
