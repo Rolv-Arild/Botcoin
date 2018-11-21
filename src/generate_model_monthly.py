@@ -1,9 +1,8 @@
-import pandas
 import tensorflow as tf
 import time
 
-from example.simple_bitcoin_predictor import SimpleBitcoinPredictor
-from util.util import find_increase, generate_classes, get_data
+from src.simple_bitcoin_predictor import SimpleBitcoinPredictor
+from src.util.util import get_data
 
 sample_size = 24 * 30
 batch_size = 100

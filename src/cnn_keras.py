@@ -1,19 +1,15 @@
-import keras
-import pandas
 import matplotlib.pyplot as plt
 import os
 os.environ["PATH"] += os.pathsep + 'C:/Program Files (x86)/Graphviz2.38/bin/'
 from keras.callbacks import ReduceLROnPlateau, ModelCheckpoint
 from keras.models import Sequential
-from keras.layers import Dense, Dropout, Flatten, Convolution2D, LeakyReLU, BatchNormalization, Activation
-from keras.layers import Conv1D, MaxPooling1D
+from keras.layers import Dense, Dropout, Flatten, LeakyReLU, BatchNormalization, Activation
+from keras.layers import Conv1D
 from keras.optimizers import Nadam
-from util.util import find_increase, generate_classes, get_data, get_full_data
+from src.util.util import get_full_data
 import numpy as np
 
 # Eksempelkode fra https://towardsdatascience.com/build-your-own-convolution-neural-network-in-5-mins-4217c2cf964f
-
-from util.util import find_increase
 
 batch_size = 2000
 epochs = 1000
