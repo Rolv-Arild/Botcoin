@@ -1,19 +1,19 @@
-import keras
-import pandas
 import matplotlib.pyplot as plt
 import os
+import os
+
+import matplotlib.pyplot as plt
+
 os.environ["PATH"] += os.pathsep + 'C:/Program Files (x86)/Graphviz2.38/bin/'
 from keras.callbacks import ReduceLROnPlateau, ModelCheckpoint
 from keras.models import Sequential
-from keras.layers import Dense, Dropout, Flatten, Convolution2D, LeakyReLU, BatchNormalization, Activation
-from keras.layers import Conv1D, MaxPooling1D
+from keras.layers import Dense, Dropout, Flatten, LeakyReLU, BatchNormalization, Activation
+from keras.layers import Conv1D
 from keras.optimizers import Nadam
-from util.util import find_increase, generate_classes, get_data, get_full_data, get_reduced_data
+from util.util import get_data
 import numpy as np
 
 # Eksempelkode fra https://towardsdatascience.com/build-your-own-convolution-neural-network-in-5-mins-4217c2cf964f
-
-from util.util import find_increase
 
 batch_size = 2000
 epochs = 1000
@@ -67,7 +67,7 @@ model.compile(optimizer=opt,
               metrics=['accuracy'])
 
 reduce_lr = ReduceLROnPlateau(monitor='val_acc', factor=0.7, patience=30, min_lr=0.0001, verbose=1)
-checkpointer = ModelCheckpoint(filepath="tmp/model.hdf5", verbose=1, save_best_only=True)
+checkpointer = ModelCheckpoint(filepath="../resources/tmp/model.hdf5", verbose=1, save_best_only=True)
 
 history = model.fit(x_train, y_train,
                     epochs=epochs,
