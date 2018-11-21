@@ -26,7 +26,7 @@ with tf.Session() as session:
     for epoch in range(100):
         run_epoch(session, model, minimize_operation, batch_size, sample_size, x, y, epoch)
 
-    save_path = saver.save(session, "tmp/lstm-model-close.ckpt")
+    save_path = saver.save(session, "../resources/tmp/lstm-model-close.ckpt")
 
     plot_prediction(session, model, x)
 

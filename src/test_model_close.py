@@ -31,7 +31,7 @@ with tf.Session() as session:
 
     for epoch in range(100):
         run_epoch(session, model, minimize_operation, batch_size, sample_size, x_train, y_train, epoch)
-        save_path = saver.save(session, "tmp/lstm-model-close-1hour.ckpt")
+        save_path = saver.save(session, "../resources/tmp/lstm-model-close-1hour.ckpt")
         acc.append(test_model(saver, session, model, sample_size, x_test, y_test, save_path, 1)[0])
 
     session.close()

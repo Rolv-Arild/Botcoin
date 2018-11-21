@@ -60,7 +60,7 @@ model.compile(optimizer=opt,
               metrics=['accuracy'])
 
 reduce_lr = ReduceLROnPlateau(monitor='val_acc', factor=0.7, patience=30, min_lr=0.0001, verbose=1)
-checkpointer = ModelCheckpoint(filepath="tmp/model.hdf5", verbose=1, save_best_only=True)
+checkpointer = ModelCheckpoint(filepath="../resources/tmp/model.hdf5", verbose=1, save_best_only=True)
 
 history = model.fit(x_train, y_train,
                     epochs=epochs,
