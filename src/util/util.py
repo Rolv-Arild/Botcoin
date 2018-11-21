@@ -1,12 +1,11 @@
 import bisect
 import datetime
-import pandas
-import numpy as np
+
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas
 from matplotlib.collections import LineCollection
 from matplotlib.colors import ListedColormap, BoundaryNorm
-
-from src.simple_bitcoin_predictor import SimpleBitcoinPredictor
 
 
 def normalize_data(data, from_zero=True):

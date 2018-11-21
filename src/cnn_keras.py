@@ -1,5 +1,3 @@
-import matplotlib.pyplot as plt
-import os
 import os
 
 import matplotlib.pyplot as plt
@@ -10,7 +8,7 @@ from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten, LeakyReLU, BatchNormalization, Activation
 from keras.layers import Conv1D
 from keras.optimizers import Nadam
-from util.util import get_data
+from src.util.util import get_data
 import numpy as np
 
 # Eksempelkode fra https://towardsdatascience.com/build-your-own-convolution-neural-network-in-5-mins-4217c2cf964f
