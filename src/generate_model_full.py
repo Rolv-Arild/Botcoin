@@ -6,9 +6,9 @@ from src.util.util import get_full_data, plot_prediction
 sample_size = 24 * 30
 batch_size = 2000
 num_classes = 3
-num_features = 43
+num_features = 42
 
-x, y = get_full_data(num_classes, 60)
+x, y, data = get_full_data(num_classes, 60)
 
 model = SimpleBitcoinPredictor(num_features, num_classes)
 
