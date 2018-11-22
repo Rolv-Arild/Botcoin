@@ -1,7 +1,7 @@
 import tensorflow as tf
 
 from src.simple_bitcoin_predictor import SimpleBitcoinPredictor, run_epoch
-from src.util.util import get_full_data, plot_prediction
+from src.util.util import get_full_data
 
 sample_size = 24 * 30
 batch_size = 2000
@@ -27,7 +27,5 @@ with tf.Session() as session:
         run_epoch(session, model, minimize_operation, batch_size, sample_size, x, y, epoch)
 
     save_path = saver.save(session, "../resources/tmp/lstm-model-close.ckpt")
-
-    plot_prediction(session, model, x)
 
     session.close()
