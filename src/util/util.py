@@ -195,6 +195,8 @@ def plot_prediction(session, model, title, data, x, y):
         p = session.run(model.f, {model.batch_size: 1, model.x: [data[:i + 1]]})[0]
         preds.append(np.argmax(p))
 
+    x = x[1:]
+    y = y[1:]
     points = np.array([x, y]).T.reshape(-1, 1, 2)
     segments = np.concatenate([points[:-1], points[1:]], axis=1)
     fig, ax = plt.subplots()
